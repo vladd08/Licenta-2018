@@ -1,32 +1,24 @@
 package licenta.orbulescu.vlad.smartoffice;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Entity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +27,17 @@ import java.util.List;
  * Created by Vlad Orbulescu on 2/27/2018.
  */
 
-public class SearchBluetoothModule implements IBluetoothInterface {
+public class BluetoothModule implements IBluetoothInterface {
     private Context context;
     private Activity activity;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
     private boolean mScanning = false;
+    private BluetoothGatt bluetoothGatt;
     private List<BluetoothDevice> deviceList = new ArrayList<BluetoothDevice>();
     private List<String> deviceNameList = new ArrayList<String>();
 
-    public SearchBluetoothModule(Context context, Activity activity) {
+    public BluetoothModule(Context context, Activity activity) {
         this.activity = activity;
         this.context = context;
     }
@@ -81,7 +74,7 @@ public class SearchBluetoothModule implements IBluetoothInterface {
     @Override
     public List<BluetoothDevice> startScanning(final boolean enable) {
         bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
-        final licenta.orbulescu.vlad.smartoffice.ProgressBar mProgress = new licenta.orbulescu.vlad.smartoffice.ProgressBar(activity);
+        final ProgressBarModule mProgress = new ProgressBarModule(activity);
         Handler mHandler = new Handler();
         //clear memory
         deviceList = new ArrayList<BluetoothDevice>();
@@ -115,6 +108,95 @@ public class SearchBluetoothModule implements IBluetoothInterface {
             bluetoothLeScanner.stopScan(scanCallback);
         }
         return deviceList;
+    }
+
+    @Override
+    public BluetoothDevice connectToGatt(final BluetoothDevice device) {
+        BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+            @Override
+            public void onPhyUpdate(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
+                super.onPhyUpdate(gatt, txPhy, rxPhy, status);
+            }
+
+            @Override
+            public void onPhyRead(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
+                super.onPhyRead(gatt, txPhy, rxPhy, status);
+            }
+
+            @Override
+            public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                super.onConnectionStateChange(gatt, status, newState);
+                if(newState == BluetoothProfile.STATE_CONNECTED) {
+                    gatt.discoverServices();
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    activity.startActivity(new Intent(context, CodeGeneratorActivity.class));
+                }
+            }
+
+            @Override
+            public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                super.onServicesDiscovered(gatt, status);
+            }
+
+            @Override
+            public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                super.onCharacteristicRead(gatt, characteristic, status);
+            }
+
+            @Override
+            public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                super.onCharacteristicWrite(gatt, characteristic, status);
+            }
+
+            @Override
+            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+                super.onCharacteristicChanged(gatt, characteristic);
+            }
+
+            @Override
+            public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+                super.onDescriptorRead(gatt, descriptor, status);
+            }
+
+            @Override
+            public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+                super.onDescriptorWrite(gatt, descriptor, status);
+            }
+
+            @Override
+            public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
+                super.onReliableWriteCompleted(gatt, status);
+            }
+
+            @Override
+            public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+                super.onReadRemoteRssi(gatt, rssi, status);
+            }
+
+            @Override
+            public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+                super.onMtuChanged(gatt, mtu, status);
+            }
+        };
+        bluetoothGatt = device.connectGatt(context, true, gattCallback);
+        ToasterService tService = new ToasterService();
+        if(bluetoothGatt.getDevice().equals(device)) {
+           tService.setMessage(context.getString(R.string.connected_to) + " " + device.getName());
+           tService.DisplayToast(context, 1);
+           return device;
+        } else {
+            tService.setMessage(context.getString(R.string.device_connection_error));
+            tService.DisplayToast(context, 1);
+            return null;
+        }
+    }
+
+    @Override
+    public BluetoothDevice getConnectedDevice() {
+        if(bluetoothGatt != null) {
+            return bluetoothGatt.getDevice();
+        }
+        else return null;
     }
 
     //scanning callback
@@ -160,12 +242,18 @@ public class SearchBluetoothModule implements IBluetoothInterface {
             tService.DisplayToast(context,1);
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-            CharSequence devices[] = deviceNameList.toArray(new CharSequence[deviceNameList.size()]);
+            final CharSequence devices[] = deviceNameList.toArray(new CharSequence[deviceNameList.size()]);
             builder.setTitle(R.string.select_a_device);
             builder.setItems(devices, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // the user clicked on colors[which]
+                    for(BluetoothDevice dev : deviceList) {
+                        if(dev.getName().equals(devices[which])) {
+                            Intent intent = new Intent(activity, CodeGeneratorActivity.class);
+                            intent.putExtra("ConnectToDevice", dev);
+                            activity.startActivity(intent);
+                        }
+                    }
                 }
             });
             builder.show();

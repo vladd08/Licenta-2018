@@ -1,10 +1,6 @@
 package licenta.orbulescu.vlad.smartoffice;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.le.ScanCallback;
-import android.content.Context;
-import android.support.v4.content.ContextCompat;
 
 import java.util.List;
 
@@ -20,4 +16,6 @@ public interface IBluetoothInterface {
     void checkBLECapable();
     boolean checkBluetoothEnabled();
     List<BluetoothDevice> startScanning(final boolean enable);
+    BluetoothDevice connectToGatt(BluetoothDevice device);
+    BluetoothDevice getConnectedDevice();
 }

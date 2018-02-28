@@ -9,13 +9,13 @@ import android.widget.FrameLayout;
  * Created by Vlad Orbulescu on 2/27/2018.
  */
 
-public class ProgressBar {
+public class ProgressBarModule {
     private Activity activity;
     android.widget.ProgressBar progressBar;
     private AlphaAnimation inAnimation;
     private AlphaAnimation outAnimation;
 
-    public ProgressBar(Activity activity) {
+    public ProgressBarModule(Activity activity) {
         this.activity = activity;
         progressBar = (android.widget.ProgressBar) activity.findViewById(R.id.progressBar);
     }

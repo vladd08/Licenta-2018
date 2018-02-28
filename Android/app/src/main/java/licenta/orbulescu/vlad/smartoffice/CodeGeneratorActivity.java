@@ -1,6 +1,11 @@
 package licenta.orbulescu.vlad.smartoffice;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -12,25 +17,34 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class BluetoothSearchActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-    private BluetoothModule bluetoothModule;
-    private PermissionsModule permissionsModule;
-    private Button searchBttn;
-    private List<BluetoothDevice> deviceList = new ArrayList<BluetoothDevice>();
+import static android.bluetooth.BluetoothProfile.GATT;
 
+public class CodeGeneratorActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener {
+    private BluetoothDevice connectedDevice;
+    private BluetoothModule bluetoothModule;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bluetooth_search);
+        bluetoothModule = new BluetoothModule(this,this);
+
+        setContentView(R.layout.activity_code_generator);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Bundle bundle = new Bundle();
+        bundle = getIntent().getExtras();
+
+        if(bundle!=null) {
+            if((connectedDevice = (BluetoothDevice) bundle.get("ConnectToDevice"))!=null) {
+                connectedDevice = bluetoothModule.connectToGatt(connectedDevice);
+            }
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -39,21 +53,8 @@ public class BluetoothSearchActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //start of declarations needed for the search
-        searchBttn = (Button) findViewById(R.id.searchBttn);
-        searchBttn.setOnClickListener(new ClickListener());
-
-        //bluetooth module start
-        bluetoothModule = new BluetoothModule(this, this);
-        permissionsModule = new PermissionsModule(this,this);
-        bluetoothModule.checkBLECapable();
-        bluetoothModule.checkBluetoothPermission();
-        permissionsModule.checkLocationPermission();
-
     }
 
-    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -85,6 +86,33 @@ public class BluetoothSearchActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //if already connected
+        if(connectedDevice != null) {
+            findViewById(R.id.connected_image).setVisibility(View.VISIBLE);
+            findViewById(R.id.connected_text1).setVisibility(View.VISIBLE);
+            findViewById(R.id.connected_text2).setVisibility(View.VISIBLE);
+            findViewById(R.id.connected_to).setVisibility(View.VISIBLE);
+            findViewById(R.id.placeholder).setVisibility(View.VISIBLE);
+            TextView tv = (TextView) findViewById(R.id.placeholder);
+            tv.setText(connectedDevice.getName());
+
+            findViewById(R.id.not_connected_image).setVisibility(View.INVISIBLE);
+            findViewById(R.id.not_connected_text).setVisibility(View.INVISIBLE);
+        } else { //if not connected
+            findViewById(R.id.connected_image).setVisibility(View.INVISIBLE);
+            findViewById(R.id.connected_text1).setVisibility(View.INVISIBLE);
+            findViewById(R.id.connected_text2).setVisibility(View.INVISIBLE);
+            findViewById(R.id.connected_to).setVisibility(View.INVISIBLE);
+            findViewById(R.id.placeholder).setVisibility(View.INVISIBLE);
+
+            findViewById(R.id.not_connected_image).setVisibility(View.VISIBLE);
+            findViewById(R.id.not_connected_text).setVisibility(View.VISIBLE);
+        }
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
 
@@ -93,11 +121,17 @@ public class BluetoothSearchActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_account) {
-            // Handle the camera action
-        } else if (id == R.id.nav_generator) {
-            startActivity(new Intent(this, CodeGeneratorActivity.class));
-        } else if (id == R.id.nav_connect) {
 
+        } else if (id == R.id.nav_generator) {
+
+        } else if (id == R.id.nav_connect) {
+            if(bluetoothModule.getConnectedDevice() != null) {
+                ToasterService tService = new ToasterService();
+                tService.setMessage(getString(R.string.already_connected_to_device));
+                tService.DisplayToast(this, 1);
+            } else {
+                startActivity(new Intent(this, BluetoothSearchActivity.class));
+            }
         } else if (id == R.id.nav_logout) {
 
         }
@@ -106,26 +140,4 @@ public class BluetoothSearchActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return false;
     }
-
-    private class ClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            boolean btEn = bluetoothModule.checkBluetoothEnabled();
-            boolean locEn = permissionsModule.checkLocationPermissionEnabled();
-            if(btEn && locEn ) {
-                bluetoothModule.startScanning(true);
-            } else if(!btEn) {
-                ToasterService tService = new ToasterService();
-                tService.setMessage(getString(R.string.please_enable_bluetooth));
-                tService.DisplayToast(getBaseContext(), 1);
-                bluetoothModule.checkBluetoothPermission();
-            } else if (!locEn) {
-                ToasterService tService = new ToasterService();
-                tService.setMessage(getString(R.string.please_grant_location_permission));
-                tService.DisplayToast(getBaseContext(), 1);
-                permissionsModule.checkLocationPermission();
-            }
-        }
-    }
 }
-

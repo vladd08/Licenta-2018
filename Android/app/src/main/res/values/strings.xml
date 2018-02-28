@@ -13,8 +13,13 @@
     <string name="please_grant_location_permission">Please grant permission to your device\'s location!</string>
     <string name="location_permission_granted">The location permission granted successfully!</string>
     <string name="location_permission_not_granted">The location permission was not granted!</string>
-    <string name="found_devices">Bluetooth devices found</string>
     <string name="select_a_device">Select a device:</string>
-    <string name="no_devices_found_nearby">No devices were found nearby!</string>
     <string name="no_device_found">No device was found!</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="already_connected_to_device">You are already connected to your device!</string>
+    <string name="device_connection_error">Could not connect to device, please try again!</string>
+    <string name="connected_to">Connected to:</string>
+    <string name="looks_good">Looks good!</string>
+    <string name="no_requests_available">There are no requests available at this time. Back to work!</string>
+    <string name="please_connect">Please connect to your Arduino device!</string>
 </resources>
