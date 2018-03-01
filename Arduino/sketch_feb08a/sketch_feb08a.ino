@@ -20,6 +20,7 @@ void setup() {
   }
   BTSerial.begin(9600);
   rfid.begin();  
+  BTSerial.write("AT\r\n");
 }
 
 void loop() {
@@ -28,12 +29,13 @@ void loop() {
    BTSerial.listen();
    if(BTSerial.available())
    {
-    Serial.write(BTSerial.read());
+      Serial.write(BTSerial.read());
+      
    }
 
    if(Serial.available())
    {
-    BTSerial.write(Serial.read());
+      BTSerial.write(Serial.read());
    }
 
    if(rfid.available()){

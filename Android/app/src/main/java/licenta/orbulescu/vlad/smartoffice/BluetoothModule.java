@@ -8,8 +8,11 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattServer;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.BluetoothSocket;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -18,8 +21,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,19 +35,26 @@ import java.util.List;
  * Created by Vlad Orbulescu on 2/27/2018.
  */
 
-public class BluetoothModule implements IBluetoothInterface {
+public class BluetoothModule implements IBluetoothInterface, Serializable {
     private Context context;
     private Activity activity;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
-    private boolean mScanning = false;
+    private OutputStream outputStream;
+    private InputStream inStream;
     private BluetoothGatt bluetoothGatt;
     private List<BluetoothDevice> deviceList = new ArrayList<BluetoothDevice>();
     private List<String> deviceNameList = new ArrayList<String>();
+    private BluetoothDevice connectedDevice;
+    private BluetoothGattCharacteristic mWriteCharacteristic;
+    private ParcelUuid[] uuids;
 
     public BluetoothModule(Context context, Activity activity) {
         this.activity = activity;
         this.context = context;
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
     }
 
     @Override
@@ -49,10 +64,6 @@ public class BluetoothModule implements IBluetoothInterface {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-        //finally sets the adapter after the bluetooth was turned on
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
     }
 
     @Override
@@ -84,7 +95,6 @@ public class BluetoothModule implements IBluetoothInterface {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mScanning = false;
                     mProgress.hideBar();
                     bluetoothLeScanner.stopScan(scanCallback);
                     if (!deviceList.isEmpty()) {
@@ -99,11 +109,9 @@ public class BluetoothModule implements IBluetoothInterface {
                     showDevicesDialog();
                 }
             }, SCAN_PERIOD);
-            mScanning = true;
             mProgress.showBar();
             bluetoothLeScanner.startScan(scanCallback);
         } else {
-            mScanning = false;
             mProgress.hideBar();
             bluetoothLeScanner.stopScan(scanCallback);
         }
@@ -127,7 +135,7 @@ public class BluetoothModule implements IBluetoothInterface {
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                 super.onConnectionStateChange(gatt, status, newState);
                 if(newState == BluetoothProfile.STATE_CONNECTED) {
-                    gatt.discoverServices();
+                    bluetoothGatt.discoverServices();
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     activity.startActivity(new Intent(context, CodeGeneratorActivity.class));
                 }
@@ -136,6 +144,17 @@ public class BluetoothModule implements IBluetoothInterface {
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                 super.onServicesDiscovered(gatt, status);
+                List<BluetoothGattService> services = gatt.getServices();
+                for(BluetoothGattService service: services) {
+                    List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
+                    for(BluetoothGattCharacteristic charact : characteristics) {
+                        final int charaProp = charact.getProperties();
+                        if (((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) |
+                                (charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) > 0) {
+                            mWriteCharacteristic = charact;
+                        }
+                    }
+                }
             }
 
             @Override
@@ -182,6 +201,7 @@ public class BluetoothModule implements IBluetoothInterface {
         ToasterService tService = new ToasterService();
         if(bluetoothGatt.getDevice().equals(device)) {
            tService.setMessage(context.getString(R.string.connected_to) + " " + device.getName());
+           connectedDevice = device;
            tService.DisplayToast(context, 1);
            return device;
         } else {
@@ -193,10 +213,11 @@ public class BluetoothModule implements IBluetoothInterface {
 
     @Override
     public BluetoothDevice getConnectedDevice() {
-        if(bluetoothGatt != null) {
-            return bluetoothGatt.getDevice();
+        if(connectedDevice != null) {
+            return connectedDevice;
+        } else {
+            return null;
         }
-        else return null;
     }
 
     //scanning callback
@@ -257,6 +278,13 @@ public class BluetoothModule implements IBluetoothInterface {
                 }
             });
             builder.show();
+        }
+    }
+    public void sendData(String data) throws IOException {
+        if(mBluetoothAdapter.getBondedDevices().size() > 0) {
+            byte[] dataBytes = data.getBytes();
+            mWriteCharacteristic.setValue(dataBytes);
+            bluetoothGatt.writeCharacteristic(mWriteCharacteristic);
         }
     }
 }

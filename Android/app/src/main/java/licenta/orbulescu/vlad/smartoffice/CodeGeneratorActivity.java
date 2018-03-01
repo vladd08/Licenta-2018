@@ -7,8 +7,11 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,12 +23,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.bluetooth.BluetoothProfile.GATT;
 
 public class CodeGeneratorActivity extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener,
+        ConfigureDeviceFragment.OnFragmentInteractionListener{
     private BluetoothDevice connectedDevice;
     private BluetoothModule bluetoothModule;
     @Override
@@ -56,6 +61,8 @@ public class CodeGeneratorActivity extends AppCompatActivity implements
     }
 
     public void onBackPressed() {
+        getFragmentManager().popBackStackImmediate();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -80,7 +87,21 @@ public class CodeGeneratorActivity extends AppCompatActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            if(bluetoothModule.getConnectedDevice() == null) {
+                ToasterService tService = new ToasterService();
+                tService.setMessage(getString(R.string.you_must_be_connected_to_configure));
+                tService.DisplayToast(this, 0);
+            } else {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("module", bluetoothModule);
+                ConfigureDeviceFragment configureDeviceFragment = new ConfigureDeviceFragment();
+                configureDeviceFragment.setArguments(bundle);
+                findViewById(R.id.fragment_container);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container,configureDeviceFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -139,5 +160,10 @@ public class CodeGeneratorActivity extends AppCompatActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
