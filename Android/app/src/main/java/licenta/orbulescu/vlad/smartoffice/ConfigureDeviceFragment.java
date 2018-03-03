@@ -2,6 +2,7 @@ package licenta.orbulescu.vlad.smartoffice;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -19,7 +21,6 @@ import java.io.IOException;
 
 public class ConfigureDeviceFragment extends Fragment implements View.OnClickListener {
     private EditText deviceName;
-    private EditText devicePassword;
     private BluetoothModule module;
     private BluetoothDevice connectedDevice;
     private OnFragmentInteractionListener mListener;
@@ -51,7 +52,6 @@ public class ConfigureDeviceFragment extends Fragment implements View.OnClickLis
         Button cancelButton =  (Button) view.findViewById(R.id.button_cancel);
         Button configureButton =  (Button) view.findViewById(R.id.button_configure);
         deviceName = (EditText) view.findViewById(R.id.editName);
-        devicePassword = (EditText) view.findViewById(R.id.editPass);
         cancelButton.setOnClickListener(this);
         configureButton.setOnClickListener(this);
         module = (BluetoothModule) getArguments().getSerializable("module");
@@ -69,7 +69,6 @@ public class ConfigureDeviceFragment extends Fragment implements View.OnClickLis
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        module = new BluetoothModule(getActivity().getApplicationContext(), getActivity());
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -99,12 +98,26 @@ public class ConfigureDeviceFragment extends Fragment implements View.OnClickLis
     }
 
     public void configureDevice() throws IOException {
-        if(deviceName.getText().toString() != "" && devicePassword.getText().toString() != "") {
-            module.sendData("AT");
+        String name = deviceName.getText().toString();
+        ToasterService tService = new ToasterService();
+        if(!name.isEmpty() ) {
+            if(name.length() <= 10){
+                try {
+                    module.sendData(getString(R.string.name_command) + name);
+                    tService.setMessage(getString(R.string.please_reconnect_device));
+                    tService.DisplayToast(this.getActivity().getApplicationContext(),1);
+                    getActivity().onBackPressed();
+                } catch (IOException ex) {
+                    tService.setMessage(getString(R.string.could_not_deliver_data));
+                    tService.DisplayToast(getContext(), 1);
+                }
+            } else {
+                tService.setMessage(getString(R.string.max_10_chars_error));
+                tService.DisplayToast(this.getActivity().getApplicationContext(),1);
+            }
         } else {
-            ToasterService tService = new ToasterService();
             tService.setMessage(getString(R.string.fill_the_form));
-            tService.DisplayToast(getContext(),0);
+            tService.DisplayToast(this.getActivity().getApplicationContext(),0);
         }
     }
 

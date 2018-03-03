@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class BluetoothModule implements IBluetoothInterface, Serializable {
     private List<String> deviceNameList = new ArrayList<String>();
     private BluetoothDevice connectedDevice;
     private BluetoothGattCharacteristic mWriteCharacteristic;
+    private BluetoothGattCharacteristic mReadCharacteristic;
     private ParcelUuid[] uuids;
 
     public BluetoothModule(Context context, Activity activity) {
@@ -134,10 +136,14 @@ public class BluetoothModule implements IBluetoothInterface, Serializable {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                 super.onConnectionStateChange(gatt, status, newState);
-                if(newState == BluetoothProfile.STATE_CONNECTED) {
-                    bluetoothGatt.discoverServices();
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    activity.startActivity(new Intent(context, CodeGeneratorActivity.class));
+                if(status == gatt.GATT_SUCCESS) {
+                    if(newState == BluetoothProfile.STATE_CONNECTED) {
+                        bluetoothGatt.discoverServices();
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        activity.startActivity(new Intent(context, CodeGeneratorActivity.class));
+                    }
+                } else {
+                    //TODO do something
                 }
             }
 
@@ -152,6 +158,13 @@ public class BluetoothModule implements IBluetoothInterface, Serializable {
                         if (((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) |
                                 (charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) > 0) {
                             mWriteCharacteristic = charact;
+                        }
+                        if (((charaProp & BluetoothGattCharacteristic.PROPERTY_READ)) > 0) {
+                            mReadCharacteristic = charact;
+                            bluetoothGatt.setCharacteristicNotification(mReadCharacteristic,true);
+                            for(BluetoothGattDescriptor descriptor : charact.getDescriptors()) {
+                                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                            }
                         }
                     }
                 }
@@ -170,6 +183,8 @@ public class BluetoothModule implements IBluetoothInterface, Serializable {
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                 super.onCharacteristicChanged(gatt, characteristic);
+                //value is the response
+                String value = new String(characteristic.getValue(), StandardCharsets.UTF_8);
             }
 
             @Override
