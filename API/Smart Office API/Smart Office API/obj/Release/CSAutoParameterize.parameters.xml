@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="SoftwareAnalysisCo-Web.config Connection String" description="SoftwareAnalysisCo Connection String used in web.config by the application to access the database." defaultValue="Integrated Security=False;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="E:\\Facultate\\Licenta\\Repo\\API\\Smart\ Office\ API\\Smart\ Office\ API\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='SoftwareAnalysisCo']/@connectionString" />
+  </parameter>
+</parameters>

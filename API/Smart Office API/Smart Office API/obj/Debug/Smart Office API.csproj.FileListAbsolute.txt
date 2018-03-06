@@ -1,0 +1,37 @@
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\ApplicationInsights.config
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Smart Office API.dll.config
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Smart Office API.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Smart Office API.pdb
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.Agent.Intercept.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.DependencyCollector.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.PerfCounterCollector.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.ServerTelemetryChannel.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.Web.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.WindowsServer.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.ApplicationInsights.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AspNet.WebApi.Versioning.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.Web.Infrastructure.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Newtonsoft.Json.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Swashbuckle.Core.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.IdentityModel.Tokens.Jwt.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.Net.Http.Formatting.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.Web.Http.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.Web.Http.WebHost.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\WebActivatorEx.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AspNet.WebApi.Versioning.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.IdentityModel.Tokens.Jwt.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.ApplicationInsights.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.DependencyCollector.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.ServerTelemetryChannel.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.WindowsServer.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Microsoft.AI.Web.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\Newtonsoft.Json.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.Net.Http.Formatting.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.Web.Http.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\bin\System.Web.Http.WebHost.xml
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\obj\Debug\Smart Office API.csprojResolveAssemblyReference.cache
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\obj\Debug\Smart Office API.csproj.CoreCompileInputs.cache
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\obj\Debug\Smart Office API.dll
+E:\Facultate\Licenta\Repo\API\Smart Office API\Smart Office API\obj\Debug\Smart Office API.pdb
