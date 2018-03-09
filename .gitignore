@@ -1,5 +1,5 @@
 node_modules/
 config/development.js
 config/production.js
-keys/erver.key
+keys/server.key
 keys/server.crt
