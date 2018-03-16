@@ -97,6 +97,7 @@ public class CodeGeneratorActivity extends AppCompatActivity implements
                 ConfigureDeviceFragment configureDeviceFragment = new ConfigureDeviceFragment();
                 configureDeviceFragment.setArguments(bundle);
                 findViewById(R.id.fragment_container);
+                //handling the fragment
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_container,configureDeviceFragment)
                         .addToBackStack(null)

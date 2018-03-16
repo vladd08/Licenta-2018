@@ -26,6 +26,7 @@ void setup() {
   BTSerial.begin(9600);
   rfid.begin();  
 
+//DEBUGGING 
 //  for(int i = 0 ; i < EEPROM.length(); i ++) {
 //    EEPROM.write(i,'\0');
 //  }
@@ -77,7 +78,7 @@ void loop() {
       Serial.println("The name is:");
       char subString[10];
       int y = 0;
-      //gets what is after '='
+      //gets what is after '=', because the text command has this format : NAME = name
       for(int i = 6 ; i < strlen(content); i++)
       {
         subString[y] = content[i];

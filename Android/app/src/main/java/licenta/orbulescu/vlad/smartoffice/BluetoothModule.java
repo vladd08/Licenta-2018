@@ -49,8 +49,12 @@ public class BluetoothModule implements IBluetoothInterface, Serializable {
     private BluetoothDevice connectedDevice;
     private BluetoothGattCharacteristic mWriteCharacteristic;
     private BluetoothGattCharacteristic mReadCharacteristic;
-    private ParcelUuid[] uuids;
 
+    /*
+    The constructor takes context and activity for parameters, because rather than having a new bluetooth
+    module instantiated everywhere, we would have a bluetooth that has a conection established
+    and passed around activities
+     */
     public BluetoothModule(Context context, Activity activity) {
         this.activity = activity;
         this.context = context;
@@ -147,12 +151,14 @@ public class BluetoothModule implements IBluetoothInterface, Serializable {
                 }
             }
 
+            //after the connection happens, fetch the characteristic to write and read to
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                 super.onServicesDiscovered(gatt, status);
                 List<BluetoothGattService> services = gatt.getServices();
                 for(BluetoothGattService service: services) {
                     List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
+                    //here we fetch all the characteristics
                     for(BluetoothGattCharacteristic charact : characteristics) {
                         final int charaProp = charact.getProperties();
                         if (((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) |
@@ -170,11 +176,13 @@ public class BluetoothModule implements IBluetoothInterface, Serializable {
                 }
             }
 
+            //When we read data, here is the place where we receive it
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicRead(gatt, characteristic, status);
             }
 
+            //This triggers the write event
             @Override
             public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicWrite(gatt, characteristic, status);

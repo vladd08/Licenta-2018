@@ -2,6 +2,7 @@ const
     apiRoute = require('./apis'),
     homeRoute = require('./home'),
     errorRoute = require('./error'),
+    parser = require('body-parser'),
     helmet = require('helmet'),
     debug = require('debug')('smart-office-api:server'),
     compression = require('compression');
@@ -14,6 +15,7 @@ function init(server) {
 
     server.use(helmet());
     server.use(compression());
+    server.use(parser.json());
     server.use('/api', apiRoute);
     server.use('/home', homeRoute);
     server.use('/error', errorRoute);

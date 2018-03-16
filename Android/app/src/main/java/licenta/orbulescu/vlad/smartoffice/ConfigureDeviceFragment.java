@@ -19,6 +19,11 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 
+/*
+For such kinds of configuration dialogs we use fragments, because the screen is not entirely
+an independent activity, but more a part of one
+ */
+
 public class ConfigureDeviceFragment extends Fragment implements View.OnClickListener {
     private EditText deviceName;
     private BluetoothModule module;
