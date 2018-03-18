@@ -3,3 +3,6 @@ API/smart_office_api/bin/config/development.js
 API/smart_office_api/bin/config/production.js
 *.key
 *.crt
+npm-debug.log
+.DS_Store
+/*.env
