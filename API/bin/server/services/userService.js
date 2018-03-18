@@ -19,7 +19,7 @@ class UserService {
 
     getById(callback, id) {
         if(ObjectId.isValid(id)) {
-            this.uow.query('test','SELECT','_id',ObjectId(id), null, {},(result) => {
+            this.uow.query('Users','SELECT','_id',ObjectId(id), null, {},(result) => {
                 return callback(result, null);
             });
         } else {
@@ -84,10 +84,11 @@ class UserService {
         })
     }
 
-    //called from Android to generate the access token for TFA
-    insertAccessToken(next,data) {
-
-    }
+    getAccessCodeByUsername(next, username) {
+            this.uow.query('AccessCodes','SELECT','username', username, null, {},(result) => {
+                return next(result);
+            });
+        }
 }
 
 module.exports = UserService;

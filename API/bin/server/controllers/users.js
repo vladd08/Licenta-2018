@@ -7,6 +7,7 @@ const
     jwt = require('jsonwebtoken'),
     config = require('../../config'),
     apiRoutes = require('../../../helpers/middlewares/auth'),
+    notp = require('notp'),
     UserService = require("../services/userService");
 
 let router = express.Router();
@@ -18,6 +19,8 @@ router.get('/', function(req,res){
 //using the auth middleware
 router.use('/test', apiRoutes);
 router.use('/register', apiRoutes);
+router.use('/login/2fa', apiRoutes);
+router.use('/login/2fa/verify', apiRoutes);
 
 router.get('/test', function(req,res,next){
     if(req.decoded.role != 'admin') return res.status(403).json({
@@ -69,19 +72,17 @@ router.post('/login', function(req,res,next){
                 if(resp instanceof Error) {
                     res.status(401).json({"Error": "Wrong credentials, please try again!"});
                 } else {
-                    var payload = {};
+                    var payload = {
+                        needsTfaCode: true,
+                        tfaPassed: false,
+                        userId: resp._id
+                    };
                     switch(resp.role) {
                         case 1:
-                        payload = {
-                            role: 'admin',
-                            needsTfaCode: true
-                        };
+                        payload.role = 'admin';
                         break;
                         case 4:
-                        payload = {
-                            role: 'angajat',
-                            needsTfaCode: true
-                        };
+                        payload.role = 'angajat';
                         break;
                     }
                     var token = jwt.sign(payload, config.secret, {
@@ -102,6 +103,12 @@ router.post('/register', function(req,res,next){
         'error':'unauthorized',
         'message':'Only admins can access this route.'
     });
+    if(!req.decoded.tfaPassed) {
+        return res.status(403).json({
+            'error':'unauthorized',
+            'message':'2FA not passed.'
+        });
+    }
     let db = UnitOfWork.create((uow) => {
         if (uow instanceof Error) {
             next();
@@ -152,6 +159,97 @@ router.post('/register', function(req,res,next){
                 }
             }
       });
+});
+
+//generates 2fa code
+router.post('/login/2fa', function(req,res,next) {
+    if(req.decoded.needsTfaCode) {
+            var userCardCode = req.body.userCardCode;
+            if(userCardCode) {
+                res.status(200).json({
+                    'tfa token': notp.totp.gen(userCardCode)
+                });
+            } else {
+                res.status(400).json({
+                    'success':false,
+                    'message':'please insert a tfa token.'
+                });
+            }
+    } else {
+        res.status(400).json({
+            'message' : 'can not generate 2fa code, user is already logged in.'
+        });
+    }
+});
+
+//verifies 2fa code
+router.post('/login/2fa/verify', function(req,res,next){
+    console.log(req.decoded.userId);
+    var uId = req.decoded.userId;
+    var tfaCode = req.body.tfaCode;
+    let db = UnitOfWork.create((uow) => {
+        let mUow = uow;
+        if (uow instanceof Error) {
+            next();
+            // res.status(500).json({'Error' : "Internal server error : could not connect to the database!", "IssuedOn" : new Date()})
+        } else {
+            var data = new UserService(uow);
+            data.getById(function(ress,err){
+                if(err) ress.status(404).json({
+                    'success': false,
+                    'message': 'invalid user id.'
+                });
+                if(ress.length != 0) {
+                    debug(ress);
+                    if(tfaCode) {
+                        data.getAccessCodeByUsername(function(data) {
+                            debug(data);
+                            var login = notp.totp.verify(tfaCode, data[0].accessCard);
+                            if(!login) {
+                                res.status(403).json({
+                                    'success': false,
+                                    'message': 'invalid 2fa code!'
+                                });
+                            } else {
+                                var payload = {
+                                    needsTfaCode: false,
+                                    tfaPassed: true,
+                                    userId: uId
+                                };
+                                switch(ress[0].role) {
+                                    case 1:
+                                    payload.role = 'admin';
+                                    break;
+                                    case 4:
+                                    payload.role = 'angajat';
+                                    break;
+                                }
+
+                                var token = jwt.sign(payload, config.secret, {
+                                    expiresIn: 1440
+                                });
+
+                                res.status(200).json({
+                                    'success': true,
+                                    'message': 'Successfully logged in!',
+                                    'token' : token
+                                });
+                            }
+                        }, ress[0].username);
+                    } else {
+                        res.status(400).json({
+                            'success':false,
+                            'message':'please enter tfa token.'
+                        });
+                    }
+                } else {
+                    res.status(404).json({
+                        'success':false,
+                        'message':'user not found.'
+                    });
+                }
+            },uId);
+        }});
 });
 
 module.exports = router;
