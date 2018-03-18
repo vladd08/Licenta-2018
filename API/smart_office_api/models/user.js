@@ -49,7 +49,6 @@ var UserSchema = new mongoose.Schema({
     },
     accessCard: {
         type: String,
-        required: true,
         unique: true
     },
     createdAt: {

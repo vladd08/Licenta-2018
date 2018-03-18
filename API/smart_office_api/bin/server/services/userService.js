@@ -2,7 +2,8 @@ const
     ObjectId = require('mongodb').ObjectID,
     debug = require('debug'),
     express = require("express"),
-    crypto = require("../../../helpers/middlewares/crypto");
+    crypto = require("../../../helpers/middlewares/crypto"),
+    AccessCode = require("../../../models/access"),
     User = require('../../../models/user');
 
 class UserService {
@@ -50,18 +51,44 @@ class UserService {
                     return callback(new Error("Hashing error!"));
                 } else {
                     data.password = result;
-                    let accessCode = data.accessCode;
-                    mUow.query('Users', 'INSERT', '', '', userSchema, data, function(err, resp){
-                        if(err) return callback(err);
-                        else {
-                            return callback(resp);
+                    let accessCode = data.accessCard;
+                    data.accessCard = null;
+                    mUow.query('Users', 'INSERT', '', '', userSchema, data, function(resp){
+                        if(resp) {
+                            let accessSchema = mUow.createAccessModel();
+                            let accessObj = {
+                                username: resp.username,
+                                accessCard: accessCode,
+                                createdAt: Date.now()
+                            };
+                            mUow.query('AccessCodes', 'INSERT', '', '', accessSchema, accessObj, function(response) {
+                                if(response) {
+                                    return callback(resp);
+                                } 
+                            });
                         }
                     });
                  }
             });
     }
 
-    insertAccessCardCode(callback, code) {
+    //inserting the Card Code into db
+    insertAccessCode(next, data) {
+        let accessSchema = this.uow.createAccessModel();
+        this.uow.query('AccessCodes', 'INSERT', '', '', accessSchema, data, function(err, resp) {
+            if(err) {
+                console.log(err);
+                return next(err);
+            } 
+            else {
+                console.log(resp);
+                return next(resp);
+            }
+        })
+    }
+
+    //called from Android to generate the access token for TFA
+    insertAccessToken(next,data) {
 
     }
 }

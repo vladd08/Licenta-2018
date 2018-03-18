@@ -17,6 +17,10 @@ class Crypto
             else return next(res);
         });
     }
+
+    static TfaHash(input,next) { 
+        
+    }
 }
 
 module.exports = Crypto;

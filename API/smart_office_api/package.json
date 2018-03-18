@@ -1,9 +1,15 @@
 {
   "name": "smart-office-api",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "SET NODE_ENV=development&& SET DEBUG=smart-office-api:server&& nodemon app.js"
+  },
+  "keywords": [
+    "heroku"
+  ],
+  "engines": {
+    "node": "8.9.4"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
