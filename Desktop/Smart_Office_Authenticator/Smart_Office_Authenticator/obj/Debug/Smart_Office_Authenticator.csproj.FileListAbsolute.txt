@@ -1,0 +1,12 @@
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\bin\Debug\Smart_Office_Authenticator.exe.config
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\bin\Debug\Smart_Office_Authenticator.exe
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\bin\Debug\Smart_Office_Authenticator.pdb
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\obj\Debug\Smart_Office_Authenticator.csprojResolveAssemblyReference.cache
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\obj\Debug\Smart_Office_Authenticator.Authenticator.resources
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\obj\Debug\Smart_Office_Authenticator.Properties.Resources.resources
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\obj\Debug\Smart_Office_Authenticator.csproj.GenerateResource.Cache
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\obj\Debug\Smart_Office_Authenticator.csproj.CoreCompileInputs.cache
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\obj\Debug\Smart_Office_Authenticator.exe
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\obj\Debug\Smart_Office_Authenticator.pdb
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\bin\Debug\Newtonsoft.Json.dll
+E:\Facultate\Licenta\Repo\Desktop\Smart_Office_Authenticator\Smart_Office_Authenticator\bin\Debug\Newtonsoft.Json.xml
