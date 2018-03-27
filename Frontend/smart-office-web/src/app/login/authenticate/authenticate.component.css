@@ -1,0 +1,16 @@
+.login-container{
+  display: block;
+  margin-top:100px;
+}
+
+.frame {
+  border: 1px solid rgb(175, 175, 175);
+  padding: 15px;
+  box-shadow: 2px 2px 5px #202020;
+  background-color: rgb(255, 255, 255);
+}
+
+h1 {
+  color: #2179ad;
+  font-weight: bold;
+}

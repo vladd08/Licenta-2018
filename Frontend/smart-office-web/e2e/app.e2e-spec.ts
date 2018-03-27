@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('smart-office App', () => {
+describe('smart-office-web App', () => {
   let page: AppPage;
 
   beforeEach(() => {
