@@ -1,5 +1,7 @@
 import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { NgForm, FormGroup } from '@angular/forms';
+import { AuthService } from '../shared/authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'so-login',
@@ -9,9 +11,14 @@ import { NgForm, FormGroup } from '@angular/forms';
 export class LoginComponent implements OnInit, AfterViewInit {
   loginform: FormGroup;
 
-  constructor(private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef,
+              public authService: AuthService,
+              private router: Router) { }
 
   ngOnInit() {
+    if (localStorage.getItem('tfatoken')) {
+      this.router.navigateByUrl('/main');
+    }
   }
 
   ngAfterViewInit() {
@@ -19,7 +26,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   onSubmit(form: NgForm) {
-    console.log(form.value);
+    this.authService.login(form.value.username, form.value.password);
   }
-
 }

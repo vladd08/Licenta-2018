@@ -14,3 +14,20 @@ h1 {
   color: #2179ad;
   font-weight: bold;
 }
+
+input.ng-invalid.ng-touched {
+  border: 1px solid #df1111
+}
+
+.help-block {
+  font-style: italic;
+  color: #df1111;
+}
+
+hr {
+  margin-top: 10px !important;
+}
+
+button {
+  margin-bottom:5px;
+}

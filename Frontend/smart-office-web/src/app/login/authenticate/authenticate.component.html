@@ -1,16 +1,28 @@
 <div class="row login-container">
-    <div class="col-md-4 col-md-offset-4">
-      <div class="frame">
-        <h1>SMART OFFICE</h1>
-        <form>
-          <div class="form-group">
-            <label for="code">Code</label>
-            <input type="text" class="form-control" id="usernameinput" placeholder="Enter 2FA code">
+  <div class="col-md-4 col-md-offset-4">
+    <div class="frame">
+      <h1>SMART OFFICE</h1>
+      <form (ngSubmit)="onSubmit(auth)" #auth="ngForm">
+        <div class="form-group">
+          <label for="code">Code</label>
+          <input type="text" class="form-control" id="authCode" ngModel placeholder="Enter 2FA code" name="authCode" required #authCode='ngModel'>
+          <span class="help-block" *ngIf="!auth.valid && authCode.touched">Please enter the code.</span>
+        </div>
+        <div class="row">
+          <div class="col-xs-4 col-md-4">
+            <button [disabled]="!auth.valid" type="submit" class="btn btn-primary">Authenticate</button>
           </div>
-          <button type="submit" class="btn btn-primary">Authenticate</button>
-        </form>
-        <hr>
-        <small id="hint" class="text-muted">*Generate a code using the desktop application.</small>
-      </div>
+          <div class="col-xs-4 col-md-4">
+            <button type="reset" (click)="onCancelPressed()" routerLink="/login" class="btn btn-danger">Cancel</button>
+          </div>
+          <div class="col-xs-4 col-md-4">
+            <so-spinner></so-spinner>
+          </div>
+        </div>
+      </form>
+      <span *ngIf="authService.error" class="help-block">Invalid code, please try again.</span>
+      <hr>
+      <small id="hint" class="text-muted">*Generate a code using the desktop application.</small>
     </div>
   </div>
+</div>

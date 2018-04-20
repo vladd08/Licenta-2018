@@ -1,0 +1,8 @@
+{
+  "test": "https://smart-office-api.herokuapp.com/api/v1/users/test",
+  "login": "https://smart-office-api.herokuapp.com/api/v1/users/login",
+  "2fa": "https://smart-office-api.herokuapp.com/api/v1/users/login/2fa/verify",
+  "getAllUsers": "https://smart-office-api.herokuapp.com/api/v1/users/all",
+  "createUser" : "https://smart-office-api.herokuapp.com/api/v1/users/register",
+  "editDeleteUser" : "https://smart-office-api.herokuapp.com/api/v1/users/user"
+}

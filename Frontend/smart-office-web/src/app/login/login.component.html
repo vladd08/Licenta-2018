@@ -4,18 +4,24 @@
       <h1>SMART OFFICE</h1>
       <form (ngSubmit)="onSubmit(login)" #login="ngForm">
         <div class="form-group">
-          <label for="emailinput">Username</label>
-          <input type="text" class="form-control" id="username" ngModel
-                 name="username" placeholder="Enter username" required #username="ngModel">
+          <label for="username">Username</label>
+          <input type="text" class="form-control" id="username" ngModel name="username" placeholder="Enter username" required #username="ngModel">
           <span class="help-block" *ngIf="!username.valid && username.touched">Please enter an username.</span>
         </div>
         <div class="form-group">
           <label for="passwordinput">Password</label>
-          <input type="password" class="form-control" id="passowrd" ngModel
-                 name="password" placeholder="Password" required #password="ngModel">
+          <input type="password" class="form-control" id="passowrd" ngModel name="password" placeholder="Password" required #password="ngModel">
           <span class="help-block" *ngIf="!password.valid && password.touched">Please enter a password.</span>
         </div>
-        <button [disabled]="!login.valid" type="submit" class="btn btn-primary">Login</button>
+        <div class="row" >
+          <div class="col-xs-3">
+            <button [disabled]="!login.valid || authService.loading" type="submit" class="btn btn-primary">Login</button>
+          </div>
+          <div class="col-xs-2 col-xs-offset-7 spinner-container" *ngIf="authService.loading">
+            <so-spinner></so-spinner>
+          </div>
+        </div>
+        <span *ngIf="authService.error" class="help-block">Wrong credentials, please try again.</span>
       </form>
       <hr>
       <small id="accounthelp" class="text-muted">

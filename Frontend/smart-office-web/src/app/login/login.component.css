@@ -23,3 +23,15 @@ input.ng-invalid.ng-touched {
   font-style: italic;
   color: #df1111;
 }
+
+.spinner-container {
+  margin-top:2px;
+}
+
+hr {
+  margin-top: 10px !important;
+}
+
+button {
+  margin-bottom:5px;
+}

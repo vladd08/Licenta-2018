@@ -1,0 +1,181 @@
+<div class="row">
+  <h1>All Users </h1>
+  <h4 *ngIf="!loading && !unauthorized">- {{ users?.length }} users registered -</h4>
+  <hr>
+  <so-spinner *ngIf="loading"></so-spinner>
+  <div *ngIf="unauthorized" class="alert alert-danger">
+    <strong>Please login again!</strong> Your session expired.
+  </div>
+  <table *ngIf="!loading && !unauthorized" class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">Crt.</th>
+        <th scope="col">Firstname</th>
+        <th scope="col">Lastname</th>
+        <th scope="col">Position</th>
+        <th scope="col">Age</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users; let i = index">
+        <th scope="row">{{ i + 1 }}</th>
+        <td>{{ user.firstname }}</td>
+        <td>{{ user.lastname }}</td>
+        <td>{{ user.position }}</td>
+        <td>{{ user.age }}</td>
+        <td>
+          <button (click)="showProfile(i)" class="btn btn-default btn-xs">
+            View full info
+          </button>
+          <!-- <button (click)="showAddModal(true,i)" class="btn btn-primary btn-xs">
+            Edit
+          </button> -->
+          <button (click)="deleteUser(i)" class="btn btn-danger btn-xs">
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<hr>
+<button *ngIf="!loading && !unauthorized" (click)="showAddModal()" class="btn btn-primary">Add a new user</button>
+
+<div *ngIf="showDetailForm" class="overlay">
+  <div class="container profile">
+    <div class="row">
+      <div class="col-md-3 framed">
+        <span class="glyphicon glyphicon-user"></span>
+      </div>
+      <div class="col-md-8 profile-header">
+        <button type="button" (click)="showProfile('')" class="close" aria-label="Close">
+          <span class="close" aria-hidden="true">&times;</span>
+        </button>
+        <h3>{{ user.firstname }} {{ user.lastname }}</h3>
+        <p> -{{ user.position }}- </p>
+        <p class="pull-right created-at"> Profile created at : {{ user.createdAt }}</p>
+      </div>
+    </div>
+    <hr class="profile-separator">
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <li class="list-group-item">Firstname: {{ user.firstname }}</li>
+        <li class="list-group-item">Lastname: {{ user.lastname }}</li>
+        <li class="list-group-item">Username: {{ user.username }}</li>
+        <li class="list-group-item">Age: {{ user.age }}</li>
+        <li class="list-group-item">Sex: {{ user.sex }}   <small>*(1-M , 0-F)</small></li>
+        <li class="list-group-item">Role: {{ user.role }}   <small>*(1-Admin,2-Project Manager,3-Office Manager,4-Angajat)</small></li>
+        <li class="list-group-item">Email: {{ user.email }}</li>
+        <li class="list-group-item">Address: {{ user.address }}</li>
+        <li class="list-group-item">Position: {{ user.position }}</li>
+        <li class="list-group-item">Cnp: {{ user.cnp }}</li>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showAddForm" class="overlay">
+  <div class="container addform">
+    <h1 *ngIf="!showEditForm">Add user</h1>
+    <h1 *ngIf="showEditForm">Edit user</h1>
+    <form (ngSubmit)="onSubmitAdd(adduser)" #adduser="ngForm">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="firstname">Firstname</label>
+            <input type="text" class="form-control" id="firstname" ngModel name="firstname" placeholder="E.g. Ion" required #firstname="ngModel">
+            <span class="help-block" *ngIf="!firstname.valid && firstname.touched && !showEditForm">Please enter a firstname.</span>
+          </div>
+          <div class="form-group">
+            <label for="Lastname">Lastname</label>
+            <input type="text" class="form-control" id="lastname" ngModel name="lastname" placeholder="E.g. Popescu" required #lastname="ngModel">
+            <span class="help-block" *ngIf="!lastname.valid && lastname.touched && !showEditForm">Please enter a lastname.</span>
+          </div>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" ngModel name="username" placeholder="Enter username" required #username="ngModel">
+            <span class="help-block" *ngIf="!username.valid && username.touched && !showEditForm">Please enter an username.</span>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="passowrd" ngModel name="password" placeholder="Password" required #password="ngModel">
+            <span class="help-block" *ngIf="!password.valid && password.touched && !showEditForm">Please enter a password.</span>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" class="form-control" id="email" ngModel name="email" placeholder="E.g. ionpopescu@yahoo.com" required
+              #email="ngModel">
+            <span class="help-block" *ngIf="!email.valid && email.touched && !showEditForm">Please enter an email.</span>
+          </div>
+          <div class="form-group">
+            <label for="position">Position</label>
+            <input type="text" class="form-control" id="position" ngModel name="position" placeholder="E.g. Mobile Developer" required
+              #position="ngModel">
+            <span class="help-block" *ngIf="!position.valid && position.touched && !showEditForm">Please specify the position.</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input (keyup)="onKeyPressed()" [ngClass]="!ageError ? '' : 'ng-invalid'" [(ngModel)]="ageInput" type="text" class="form-control"
+              id="age" ngModel name="age" placeholder="E.g. 22" required #age="ngModel">
+            <span class="help-block" *ngIf="!age.valid && age.touched && !showEditForm">Please enter the age.</span>
+            <span class="help-block" *ngIf="ageError">Please enter only digits.</span>
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" class="form-control" id="address" ngModel name="address" placeholder="E.g. Ep. N. Popeea Nr.9" required
+              #address="ngModel">
+            <span class="help-block" *ngIf="!address.valid && address.touched && !showEditForm">Please enter the address.</span>
+          </div>
+          <div class="form-group">
+            <label for="accesscode">Access Code</label>
+            <input (keyup)="onKeyPressedAccess()" [ngClass]="!accessCodeError ? '' : 'ng-invalid'" [(ngModel)]="codeInput" type="text"
+              class="form-control" id="accesscode" ngModel name="accesscode" placeholder="E.g. 11887653" required #accesscode="ngModel">
+            <span class="help-block" *ngIf="!accesscode.valid && accesscode.touched && !showEditForm">Please enter the accesscode.</span>
+            <span class="help-block" *ngIf="accessCodeError">Please enter only digits.</span>
+          </div>
+          <div class="form-group">
+            <label for="cnp">Cnp</label>
+            <input type="text" class="form-control" id="cnp" ngModel name="cnp" placeholder="E.g. 1870702556453" required #cnp="ngModel">
+            <span class="help-block" *ngIf="!cnp.valid && cnp.touched && !showEditForm">Please enter the address.</span>
+          </div>
+          <div class="form-group">
+            <label for="sex">Sex</label>
+            <br>
+            <label class="radio-inline">
+              <input type="radio" value="male" ngModel #sex="ngModel" name="sex">Male</label>
+            <label class="radio-inline">
+              <input checked="checked" type="radio" value="female" ngModel #sex="ngModel" name="sex">Female</label>
+            <span class="help-block" *ngIf="!sex.valid && sex.touched && !showEditForm">Please specify the sex.</span>
+          </div>
+          <div class="form-group">
+            <label for="role">Role</label>
+            <div class="radio">
+              <label>
+                <input type="radio" value="admin" ngModel #role="ngModel" name="role">Admin</label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" value="projectmanager" ngModel #role="ngModel" name="role">Project Manager</label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" value="officemanager" ngModel #role="ngModel" name="role">Office Manager</label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" value="angajat" ngModel #role="ngModel" name="role" checked="checked">Angajat</label>
+            </div>
+            <span class="help-block" *ngIf="!role.valid && role.touched && !showEditForm">Please specify the role.</span>
+          </div>
+          <hr>
+        </div>
+      </div>
+      <button *ngIf="!showEditForm" [disabled]="!adduser.valid || ageError || accessCodeError" class="btn btn-primary pull-right" type="submit">Add</button>
+      <button *ngIf="showEditForm" [disabled]="ageError || accessCodeError" class="btn btn-primary pull-right" type="submit">Edit</button>
+      <button (click)="showAddModal()" class="btn btn-danger pull-right" type="reset">Cancel</button>
+    </form>
+  </div>
+</div>
