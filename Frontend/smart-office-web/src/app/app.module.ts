@@ -20,6 +20,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Browser } from 'protractor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule, MatCheckboxModule, MatFormFieldModule } from '@angular/material';
+import { ProjectsComponent } from './smartoffice/projects/projects.component';
+import { ProjectService } from './shared/projects.service';
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -27,7 +29,8 @@ const appRoutes: Routes = [
   { path: '2fa', component: AuthenticateComponent },
   {
     path: 'main', component: SmartofficeComponent, canActivate: [AuthGuard], children: [
-      { path: 'users', component: UsersComponent }
+      { path: 'users', component: UsersComponent },
+      { path: 'projects', component: ProjectsComponent }
     ]
   }
 ];
@@ -40,7 +43,8 @@ const appRoutes: Routes = [
     SpinnerComponent,
     SmartofficeComponent,
     HeaderComponent,
-    UsersComponent
+    UsersComponent,
+    ProjectsComponent
   ],
   imports: [
     BrowserModule,
@@ -53,7 +57,7 @@ const appRoutes: Routes = [
     MatFormFieldModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [AuthService, HttpService, AuthGuard, UserService],
+  providers: [AuthService, HttpService, AuthGuard, UserService, ProjectService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

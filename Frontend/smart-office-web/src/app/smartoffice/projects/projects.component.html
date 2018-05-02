@@ -1,0 +1,80 @@
+<div class="row">
+  <h1>All Projects </h1>
+  <h4 *ngIf="!loading && !unauthorized">- {{ projects?.length }} total projects -</h4>
+  <button *ngIf="!loading && !unauthorized" class="btn btn-success btn-xs">Add a new project</button>
+  <hr>
+  <so-spinner *ngIf="loading"></so-spinner>
+  <div *ngIf="unauthorized" class="alert alert-danger">
+    <strong>Please login again!</strong> Your session expired.
+  </div>
+  <div *ngIf="!loading" class="overall-container">
+    <div *ngFor="let project of projects; let i = index" class="container">
+      <div class="row project">
+        <div class="col-md-4 project-header">
+          <h3>{{ project.name }}</h3>
+          <p class="pull-right">Started on: {{ project.started }}</p>
+        </div>
+        <div class="col-md-8 description">
+          <p class="description-text">{{ project.description }}</p>
+        </div>
+      </div>
+      <div class="row actions">
+        <div class="col-md-7 col-md-offset-4 project-actions">
+          <h3>Actions
+            <small class="overdue" *ngIf="project.finished">- OVERDUE -</small>
+            <small *ngIf="!project.finished"  class="list-group-item overdue">Deadline : {{ project.deadline }} <span *ngIf="!finished">- {{ project.daystodeadline }} Days</span></small>
+          </h3>
+          <hr>
+          <button class="btn btn-primary" (click)="showProject(i)">View full info</button>
+          <button [disabled]="project.finished" class="btn btn-success">Add asignee</button>
+          <button [disabled]="project.finished" (click)="endProject(i)" class="btn btn-danger">End project</button>
+          <hr>
+          <h3> {{ project.assignees?.length }} Assignees</h3>
+          <div class="assignees">
+            <ul class="list-group">
+              <li *ngFor="let assignee of project.assignees" class="list-group-item">{{ assignee?.firstname }} {{ assignee?.lastname }} - {{ assignee?.position }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <hr>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showDetailForm" class="overlay">
+  <div class="container profile">
+    <div class="row">
+      <div class="col-md-3 framed">
+        <span class="glyphicon glyphicon-file"></span>
+      </div>
+      <div class="col-md-8 profile-header">
+        <button type="button" (click)="showProject()" class="close" aria-label="Close">
+          <span class="close" aria-hidden="true">&times;</span>
+        </button>
+        <h3>{{ project.name }}</h3>
+        <p> -{{ project.description }}- </p>
+        <p class="pull-right created-at"> Project started at : {{ project.started }}</p>
+      </div>
+    </div>
+    <hr class="profile-separator">
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <li class="list-group-item">Hours estimated: {{ project.estimated }}
+          <input [disabled]="project?.finished" [(ngModel)]="extrahours" class="form-control input-sm" type="text" id="extrahours" name="extrahours" />
+          <button [disabled]="project?.finished" (click)="addHoursToProject()" style="margin-top:5px" class="btn btn-default btn-xs">Add more hours</button>
+        </li>
+        <li class="list-group-item">Total hours worked on : {{ project.hourstotal }}</li>
+        <li class="list-group-item">Documentation link :
+          <a>{{ project.documentationlink }}</a>
+        </li>
+        <li class="list-group-item">Git link:
+          <a>{{ project.gitlink }}</a>
+        </li>
+        <li class="list-group-item">Issue tracking link:
+          <a>{{ project.issuetrackinglink }}</a>
+        </li>
+      </div>
+    </div>
+  </div>
+</div>

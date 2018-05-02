@@ -4,5 +4,9 @@
   "2fa": "https://smart-office-api.herokuapp.com/api/v1/users/login/2fa/verify",
   "getAllUsers": "https://smart-office-api.herokuapp.com/api/v1/users/all",
   "createUser" : "https://smart-office-api.herokuapp.com/api/v1/users/register",
-  "editDeleteUser" : "https://smart-office-api.herokuapp.com/api/v1/users/user"
+  "editDeleteUser" : "https://smart-office-api.herokuapp.com/api/v1/users/user",
+  "getAllProjects" : "https://smart-office-api.herokuapp.com/api/v1/projects/all",
+  "updateProject" : "https://smart-office-api.herokuapp.com/api/v1/projects/project",
+  "addAssignment" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment",
+  "getUsersForProject" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment/project/all"
 }
