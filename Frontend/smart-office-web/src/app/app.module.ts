@@ -22,6 +22,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule, MatCheckboxModule, MatFormFieldModule } from '@angular/material';
 import { ProjectsComponent } from './smartoffice/projects/projects.component';
 import { ProjectService } from './shared/projects.service';
+import { HoursComponent } from './smartoffice/hours/hours.component';
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -30,7 +31,8 @@ const appRoutes: Routes = [
   {
     path: 'main', component: SmartofficeComponent, canActivate: [AuthGuard], children: [
       { path: 'users', component: UsersComponent },
-      { path: 'projects', component: ProjectsComponent }
+      { path: 'projects', component: ProjectsComponent },
+      { path: 'hours', component: HoursComponent }
     ]
   }
 ];
@@ -44,7 +46,8 @@ const appRoutes: Routes = [
     SmartofficeComponent,
     HeaderComponent,
     UsersComponent,
-    ProjectsComponent
+    ProjectsComponent,
+    HoursComponent
   ],
   imports: [
     BrowserModule,

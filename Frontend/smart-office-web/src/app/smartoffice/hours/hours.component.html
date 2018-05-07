@@ -1,0 +1,129 @@
+<div class="row">
+  <h3>Track your hours</h3>
+  <hr>
+  <div class="overall-container">
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-md-5">
+          <p>Current day:
+            <b [ngClass]="trackingDisabled ? 'selected-day' : ''">{{ today }}</b>
+          </p>
+        </div>
+        <div class="col-md-1">
+          <div [ngClass]="monthLowerLimit ? 'arrow-disabled' : ''" class="button-frame" (click)="previousWeek()">
+            <span class="glyphicon glyphicon-menu-left"></span>
+          </div>
+        </div>
+        <div class="col-md-5 no-padding">
+          <b>{{ selectedWeekStart }}</b> -
+          <b [ngClass]="trackingDisabled ? 'selected-day' : ''">{{ selectedWeekEnd }}</b>
+        </div>
+        <div class="col-md-1 no-padding">
+          <div [ngClass]="monthUpperLimit ? 'arrow-disabled' : ''" class="button-frame" (click)="nextWeek()">
+            <span class="glyphicon glyphicon-menu-right"></span>
+          </div>
+        </div>
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Project/Day</th>
+            <th [ngClass]="todayDate.getDay() === 1 ? 'selected-day' : ''" class="col-md-2">Monday</th>
+            <th [ngClass]="todayDate.getDay() === 2 ? 'selected-day' : ''" class="col-md-2">Tuesday</th>
+            <th [ngClass]="todayDate.getDay() === 3 ? 'selected-day' : ''" class="col-md-1">Wednesday</th>
+            <th [ngClass]="todayDate.getDay() === 4 ? 'selected-day' : ''" class="col-md-2">Thurstday</th>
+            <th [ngClass]="todayDate.getDay() === 5 ? 'selected-day' : ''" class="col-md-2">Friday</th>
+            <th class="col-md-3">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let project of projects; let i = index">
+            <th>{{ project.name }}</th>
+            <ng-container *ngIf="currentWeek == 1">
+              <td *ngFor="let tracking of monthTracking.weekOneTracking[0].projectTracking[i].trackingList; let j = index">
+                <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[0].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
+                  (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
+                  class="form-control input-sm">
+              </td>
+            </ng-container>
+            <ng-container *ngIf="currentWeek == 2">
+              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0].projectTracking[i].trackingList; let j = index">
+                <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[1].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
+                  (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
+                  class="form-control input-sm">
+              </td>
+            </ng-container>
+            <ng-container *ngIf="currentWeek == 3">
+              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0].projectTracking[i].trackingList; let j = index">
+                <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[2].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
+                  (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
+                  class="form-control input-sm">
+              </td>
+            </ng-container>
+            <ng-container *ngIf="currentWeek == 4">
+              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0].projectTracking[i].trackingList; let j = index">
+                <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[3].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
+                  (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
+                  class="form-control input-sm">
+              </td>
+            </ng-container>
+            <td>
+              <ng-container *ngIf="currentWeek == 1">
+                <input [value]="monthlyHoursForProjects[0][i].hours + ':' + monthlyHoursForProjects[0][i].minutes" disabled type="text" class="form-control input-sm">
+              </ng-container>
+              <ng-container *ngIf="currentWeek == 2">
+                <input [value]="monthlyHoursForProjects[1][i].hours + ':' + monthlyHoursForProjects[1][i].minutes" disabled type="text" class="form-control input-sm">
+              </ng-container>
+              <ng-container *ngIf="currentWeek == 3">
+                <input [value]="monthlyHoursForProjects[2][i].hours + ':' + monthlyHoursForProjects[2][i].minutes" disabled type="text" class="form-control input-sm">
+              </ng-container>
+              <ng-container *ngIf="currentWeek == 4">
+                <input [value]="monthlyHoursForProjects[3][i].hours + ':' + monthlyHoursForProjects[3][i].minutes" disabled type="text" class="form-control input-sm">
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td style="visibility: hidden"></td>
+            <td style="visibility: hidden"></td>
+            <td style="visibility: hidden"></td>
+            <td style="visibility: hidden"></td>
+            <td style="visibility: hidden"></td>
+            <td style="visibility: hidden"></td>
+            <ng-container *ngIf="currentWeek == 1">
+              <td>
+                <input [value]="monthlyHoursForProjects[0][numberOfProjects] + ':' + monthlyHoursForProjects[0][numberOfProjects+1]" type="text"
+                  disabled class="form-control input-sm">
+              </td>
+            </ng-container>
+            <ng-container *ngIf="currentWeek == 2">
+              <td>
+                <input [value]="monthlyHoursForProjects[1][numberOfProjects] + ':' + monthlyHoursForProjects[1][numberOfProjects+1]" type="text"
+                  disabled class="form-control input-sm">
+              </td>
+            </ng-container>
+            <ng-container *ngIf="currentWeek == 3">
+              <td>
+                <input [value]="monthlyHoursForProjects[2][numberOfProjects] + ':' + monthlyHoursForProjects[2][numberOfProjects+1]" type="text"
+                  disabled class="form-control input-sm">
+              </td>
+            </ng-container>
+            <ng-container *ngIf="currentWeek == 4">
+              <td>
+                <input [value]="monthlyHoursForProjects[3][numberOfProjects] + ':' + monthlyHoursForProjects[3][numberOfProjects+1]" type="text"
+                  disabled class="form-control input-sm">
+              </td>
+            </ng-container>
+
+          </tr>
+        </tbody>
+      </table>
+      <div class="col-md-12">
+        <button [disabled]="trackingDisabled || formatError" class="btn btn-primary pull-right">Submit</button>
+      </div>
+      <small>* please submit your hours until the end of the 4th Friday of the month</small>
+      <div *ngIf="formatError" class="alert alert-warning top-margin" role="alert">
+        Please use the proper format!
+      </div>
+    </div>
+  </div>
+</div>

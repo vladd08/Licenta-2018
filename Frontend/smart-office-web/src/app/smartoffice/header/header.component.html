@@ -12,6 +12,11 @@
           <span class="sub_icon glyphicon glyphicon-user"></span>
         </a>
       </li>
+      <li *ngIf="role == 'angajat'">
+        <a routerLink="/main/hours" routerLinkActive="is-active" >Hours
+          <span class="sub_icon glyphicon glyphicon-time"></span>
+        </a>
+      </li>
       <ul class="sidebar-nav" id="sidebar">
         <li *ngIf="role == 'admin' || role == 'projectmanager'">
           <a routerLink="/main/projects" routerLinkActive="is-active">Projects

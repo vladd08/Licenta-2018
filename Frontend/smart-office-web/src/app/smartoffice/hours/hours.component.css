@@ -1,0 +1,35 @@
+.overall-container {
+  height: 490px;
+  width: 1200px;
+  overflow-y: auto;
+}
+
+.button-frame {
+  border: 1px solid black;
+  cursor: pointer;
+  height:20px;
+  width:20px;
+  text-align: center;
+}
+
+.glyphicon-menu-left, .glyphicon-menu-right {
+  line-height: 10px;
+  display: inline-block;
+}
+
+.selected-day {
+  color: red;
+}
+
+.top-margin {
+  margin-top:10px;
+}
+
+.arrow-disabled {
+  background: red;
+  pointer-events: none;
+}
+
+.no-padding {
+  padding: 0px!important;
+}

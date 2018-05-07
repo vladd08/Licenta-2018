@@ -10,6 +10,7 @@ export class ProjectService {
   getAllPath = '';
   updatePath = '';
   getUsersPath = '';
+  addAssignmentPath = '';
   constructor(private httpService: HttpService,
     private http: HttpClient,
     private router: Router) {
@@ -18,6 +19,7 @@ export class ProjectService {
         this.getAllPath = data['getAllProjects'];
         this.updatePath = data['updateProject'];
         this.getUsersPath = data['getUsersForProject'];
+        this.addAssignmentPath = data['addAssignment'];
       },
       err => { console.log(err); }
     );
@@ -33,5 +35,13 @@ export class ProjectService {
 
   getUsersForProject(id) {
     return this.httpService.get(this.getUsersPath, localStorage.getItem('tfatoken'), id);
+  }
+
+  insertProject(projectData) {
+    return this.httpService.post(this.updatePath, localStorage.getItem('tfatoken'), projectData);
+  }
+
+  addAssignment(assignmentData) {
+    return this.httpService.post(this.addAssignmentPath, localStorage.getItem('tfatoken'), assignmentData);
   }
 }

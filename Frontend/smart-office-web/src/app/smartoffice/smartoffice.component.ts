@@ -17,6 +17,8 @@ export class SmartofficeComponent implements OnInit, AfterViewInit {
       this.router.navigateByUrl('main/users');
     } else if (localStorage.getItem('role') === 'projectmanager') {
       this.router.navigateByUrl('main/projects');
+    } else if (localStorage.getItem('role') === 'angajat') {
+      this.router.navigateByUrl('main/hours');
     }
   }
 

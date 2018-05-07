@@ -1,7 +1,7 @@
 <div class="row">
   <h1>All Projects </h1>
   <h4 *ngIf="!loading && !unauthorized">- {{ projects?.length }} total projects -</h4>
-  <button *ngIf="!loading && !unauthorized" class="btn btn-success btn-xs">Add a new project</button>
+  <button (click)="showProjectForm()" *ngIf="!loading && !unauthorized" class="btn btn-success btn-xs">Add a new project</button>
   <hr>
   <so-spinner *ngIf="loading"></so-spinner>
   <div *ngIf="unauthorized" class="alert alert-danger">
@@ -22,11 +22,13 @@
         <div class="col-md-7 col-md-offset-4 project-actions">
           <h3>Actions
             <small class="overdue" *ngIf="project.finished">- OVERDUE -</small>
-            <small *ngIf="!project.finished"  class="list-group-item overdue">Deadline : {{ project.deadline }} <span *ngIf="!finished">- {{ project.daystodeadline }} Days</span></small>
+            <small *ngIf="!project.finished" class="list-group-item overdue">Deadline : {{ project.deadline }}
+              <span *ngIf="!finished">- {{ project.daystodeadline }} Days</span>
+            </small>
           </h3>
           <hr>
           <button class="btn btn-primary" (click)="showProject(i)">View full info</button>
-          <button [disabled]="project.finished" class="btn btn-success">Add asignee</button>
+          <button (click)="showAssigneeForm(i)" [disabled]="project.finished" class="btn btn-success">Add asignee</button>
           <button [disabled]="project.finished" (click)="endProject(i)" class="btn btn-danger">End project</button>
           <hr>
           <h3> {{ project.assignees?.length }} Assignees</h3>
@@ -39,6 +41,106 @@
       </div>
       <hr>
     </div>
+  </div>
+</div>
+
+<div *ngIf="addProjectForm" class="overlay">
+  <div class="container profile">
+    <h1>Add Project</h1>
+    <hr>
+    <form (ngSubmit)="onSubmitProject(addproject)" #addproject="ngForm">
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="projectname">Project Name</label>
+              <input ngModel #projectName="ngModel" required name="projectname" class="form-control" id="projectname" placeholder="E.g. Software Something">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea ngModel #description="ngModel" name="description" required class="form-control" cols=30 rows=5 id="description"
+                placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="estimated">Estimated Hours</label>
+              <input ngModel #estimated="ngModel" name="estimated" type="number" class="form-control" id="estimated" placeholder="E.g. 120">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="deadline">Deadline</label>
+              <input ngModel #deadline="ngModel" name="deadline" type="date" class="form-control" id="deadline">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="documentation">Documentation Link</label>
+              <input ngModel #documentation="ngModel" name="documentation" class="form-control" id="documentation" placeholder="E.g. https://mylink.com/documentation">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="git">Git Link</label>
+              <input ngModel #git="ngModel" name="git" class="form-control" id="git" placeholder="E.g. https://mylink.com/git">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="issue">Issue Tracking Link</label>
+              <input ngModel #issue="ngModel" name="issue" class="form-control" id="issue" placeholder="E.g. https://mylink.com/issue">
+            </div>
+          </div>
+        </div>
+        <button (click)="showProjectForm()" class="btn btn-danger">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <div *ngIf="addProjectError" class="alert alert-warning project-error-alert" role="alert">
+          Please fill in all data!
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="addAssigneeForm" class="overlay">
+  <div class="container profile">
+    <h1>Add Assignee</h1>
+    <hr>
+    <div class="dropdown">
+      <p>Assignee list</p>
+      <select class="form-control" [(ngModel)]="assigneeToAdd">
+        <option *ngFor="let user of users; let i = index" value="{{user._id}}">{{ user.firstname }} {{ user.lastname }}</option>
+      </select>
+    </div>
+    <hr>
+    <div *ngIf="nothingToAdd" class="alert alert-warning" role="alert">
+      Please select a user!
+    </div>
+    <div *ngIf="alreadyExists" class="alert alert-warning" role="alert">
+      Assignee already exists!
+    </div>
+    <div *ngIf="addedSuccess" class="alert alert-success" role="alert">
+      Added successfully!
+    </div>
+    <button (click)="showAssigneeForm('')" class="btn btn-danger">Cancel</button>
+    <button (click)="addAssignee()" type="submit" class="btn btn-primary">Add</button>
   </div>
 </div>
 
@@ -61,7 +163,8 @@
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
         <li class="list-group-item">Hours estimated: {{ project.estimated }}
-          <input [disabled]="project?.finished" [(ngModel)]="extrahours" class="form-control input-sm" type="text" id="extrahours" name="extrahours" />
+          <input [disabled]="project?.finished" [(ngModel)]="extrahours" class="form-control input-sm" type="text" id="extrahours"
+            name="extrahours" />
           <button [disabled]="project?.finished" (click)="addHoursToProject()" style="margin-top:5px" class="btn btn-default btn-xs">Add more hours</button>
         </li>
         <li class="list-group-item">Total hours worked on : {{ project.hourstotal }}</li>

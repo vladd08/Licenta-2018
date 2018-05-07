@@ -14,10 +14,18 @@ export class ProjectsComponent implements OnInit {
   projects: Project[] = [];
   project: Project;
   users: User[] = [];
+  assigneeToAdd = '';
+  projectId: String = '';
+  extrahours = 0;
   loading = false;
   unauthorized = false;
   showDetailForm = false;
-  extrahours = 0;
+  addProjectForm = false;
+  addAssigneeForm = false;
+  nothingToAdd = false;
+  addedSuccess = false;
+  alreadyExists = false;
+  addProjectError = false;
   constructor(private projectService: ProjectService,
     private userService: UserService,
     public snackBar: MatSnackBar) { }
@@ -35,10 +43,8 @@ export class ProjectsComponent implements OnInit {
     this.project = {};
     this.users = [];
     this.projectService.getAllProjects().subscribe((data: any) => {
-      console.log(data);
       this.userService.getAllUsers().subscribe((dt: User[]) => {
         this.users = dt;
-        console.log(this.users);
       },
         err => {
           this.unauthorized = true;
@@ -56,22 +62,14 @@ export class ProjectsComponent implements OnInit {
         project.daystodeadline = diffDays;
         this.projects.push(project);
       }
-      let cont = 0;
       for (const project of this.projects) {
         this.projectService.getUsersForProject(project._id).subscribe((d: any) => {
-          for (const assignement of d.result) {
-            for (const p of this.projects) {
-              if (p._id === assignement.projectId) {
-                console.log(assignement);
-                p.assignees.push(this.users.find(x => x._id === assignement.userId));
-              }
-            }
+          for (const assignment of d.result) {
+            const user: User = this.users.find(x => x._id === assignment.userId);
+            project.assignees.push(user);
           }
-
-          cont += 1;
         });
       }
-      console.log(this.projects);
       this.projects.sort((p1: Project, p2: Project) => {
         if (p1.deadline < p2.deadline) {
           return 1;
@@ -116,7 +114,6 @@ export class ProjectsComponent implements OnInit {
     const body = {
       deadline: new Date(Date.now() - 864e5)
     };
-    console.log(body);
     this.projectService.updateProject(this.projects[index]._id, body).subscribe((data: any) => {
       this.snackBar.open(data.message, 'Okay', { duration: 3000 });
       this.loading = true;
@@ -129,5 +126,84 @@ export class ProjectsComponent implements OnInit {
         console.log(err);
         this.unauthorized = true;
       });
+  }
+
+  showProjectForm() {
+    this.addProjectForm = !this.addProjectForm;
+  }
+
+  showAssigneeForm(index) {
+    if (index !== '') {
+      this.projectId = this.projects[index]._id;
+      this.project = this.projects[index];
+    }
+    this.addAssigneeForm = !this.addAssigneeForm;
+  }
+
+  onSubmitProject(form) {
+    this.addProjectError = false;
+    const body = {
+      name: form.value.projectname,
+      description: form.value.description,
+      estimated: form.value.estimated,
+      started: new Date(Date.now()),
+      deadline: form.value.deadline,
+      documentationlink: form.value.documentation,
+      gitlink: form.value.git,
+      issuetrackinglink: form.value.issue
+    };
+    this.projectService.insertProject(body).subscribe((data: any) => {
+      this.snackBar.open(data, 'Okay', { duration: 3000 });
+      this.loading = true;
+      this.showProjectForm();
+      setTimeout(() => {
+        this.getAll();
+        this.loading = false;
+      }, 2000);
+    },
+      (err: any) => {
+        console.log(err);
+        if (err.status === 400 ) {
+          this.addProjectError = true;
+        } else {
+          this.unauthorized = true;
+        }
+      });
+  }
+
+  addAssignee() {
+    this.alreadyExists = false;
+    this.nothingToAdd = false;
+    this.addedSuccess = false;
+    if (this.assigneeToAdd === '') {
+      this.nothingToAdd = true;
+    } else {
+      this.nothingToAdd = false;
+      for (const assignee of this.project.assignees) {
+        if (assignee._id === this.assigneeToAdd) {
+          this.alreadyExists = true;
+        }
+      }
+      if (!this.alreadyExists) {
+        const body = {
+          userId: this.assigneeToAdd,
+          projectId: this.projectId
+        };
+        this.projectService.addAssignment(body).subscribe((data: any) => {
+          this.addedSuccess = true;
+          this.snackBar.open(data.message, 'Okay', { duration: 3000 });
+          this.loading = true;
+          this.showAssigneeForm('');
+          setTimeout(() => {
+            this.getAll();
+            this.loading = false;
+          }, 2000);
+        },
+          (err) => {
+            console.log(err);
+            this.unauthorized = true;
+          });
+      }
+    }
   }
 }

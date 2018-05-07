@@ -62,6 +62,10 @@
   opacity: 10%;
 }
 
+.project-error-alert {
+  margin-top:10px;
+}
+
 .btn-danger {
   margin-right: 10px;
 }

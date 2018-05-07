@@ -1,5 +1,5 @@
 export class Project {
-    constructor(public hourstotal?: number, name?: string,
+    constructor(public hourstotal?: number, public name?: string,
                 public description?: string, public estimated?: number,
                 public started?: Date, public deadline?: Date,
                 public finished?: boolean, public documentationlink?: string,
