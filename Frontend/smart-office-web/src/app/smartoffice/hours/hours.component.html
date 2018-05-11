@@ -118,12 +118,26 @@
         </tbody>
       </table>
       <div class="col-md-12">
-        <button [disabled]="trackingDisabled || formatError" class="btn btn-primary pull-right">Submit</button>
+        <button [disabled]="trackingDisabled || formatError || overtime[currentWeek - 1]" class="btn btn-primary pull-right">Submit</button>
       </div>
       <small>* please submit your hours until the end of the 4th Friday of the month</small>
       <div *ngIf="formatError" class="alert alert-warning top-margin" role="alert">
         Please use the proper format!
       </div>
+      <ng-container *ngIf="overtime[currentWeek - 1]">
+        <div class="alert alert-warning top-margin" role="alert">
+          Attention, you are
+          <b>{{ overtime[currentWeek - 1]}} hours</b> and
+          <b>{{ overtimeMins[currentWeek - 1]}} minutes</b> overtime this week!
+        </div>
+      </ng-container>
+      <ng-container *ngIf="totalOvertimeHours">
+        <div class="alert alert-warning top-margin" role="alert">
+          Your month overtime is
+          <b>{{ totalOvertimeHours }} hours</b> and
+          <b>{{ totalOvertimeMinutes }} minutes.</b>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

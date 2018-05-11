@@ -53,6 +53,11 @@ export class HoursComponent implements OnInit {
   overtimeMinutes = 0;
   totalHoursForAllProjects = 0;
   totalMinutesForAllProjects = 0;
+  totalOvertimeHours = 0;
+  totalOvertimeMinutes = 0;
+
+  overtime: number[] = [];
+  overtimeMins: number[] = [];
 
   previousValue: string;
   constructor() { }
@@ -66,9 +71,11 @@ export class HoursComponent implements OnInit {
     this.sundays = this.getNextSundays(); // get the next 4 Sundays of the month
     for (let i = 0; i < 4; i++) { // setting the current week of the moth - 1,2,3,4
       if ((this.mondays[i] <= this.todayDate) && (this.todayDate <= this.sundays[i])) {
-        this.currentWeek = i;
+        this.currentWeek = i + 1;
       }
     }
+    console.log(this.mondays);
+    console.log(this.sundays);
     this.selectedWeekStart = this.mondays[0].toDateString();
     this.selectedWeekEnd = this.sundays[0].toDateString();
     this.checkMonthLimits();
@@ -182,6 +189,7 @@ export class HoursComponent implements OnInit {
   }
 
   checkMonthLimits() {
+    console.log(this.currentWeek);
     this.monthLowerLimit = this.currentWeek === 1 ? true : false;
     this.monthUpperLimit = this.currentWeek === 4 ? true : false;
   }
@@ -313,6 +321,11 @@ export class HoursComponent implements OnInit {
       case 3: trackingArraySelect = this.monthlyHoursForProjects[2]; break;
       case 4: trackingArraySelect = this.monthlyHoursForProjects[3]; break;
     }
+    if (trackingArraySelect[this.numberOfProjects] > 40) {
+      this.overtime[this.currentWeek - 1] = trackingArraySelect[this.numberOfProjects] - 40;
+    } else {
+      this.overtime[this.currentWeek - 1] = 0;
+    }
     console.log(trackingArraySelect);
     for (let i = 0; i < this.numberOfProjects; i++) {
       totalHours += trackingArraySelect[i].hours;
@@ -324,5 +337,30 @@ export class HoursComponent implements OnInit {
     }
     trackingArraySelect[this.numberOfProjects] = totalHours;
     trackingArraySelect[this.numberOfProjects + 1] = totalMinutes;
+    if (trackingArraySelect[this.numberOfProjects] > 40) {
+      this.overtime[this.currentWeek - 1] = trackingArraySelect[this.numberOfProjects] - 40;
+      this.overtimeMins[this.currentWeek - 1] = trackingArraySelect[this.numberOfProjects + 1];
+    } else {
+      this.overtime[this.currentWeek - 1] = 0;
+      this.overtimeMins[this.currentWeek - 1] = 0;
+    }
+    this.totalOvertimeHours = 0;
+    this.totalOvertimeMinutes = 0;
+    for (let i = 0; i < 4; i++) {
+      if (this.overtime[i]) {
+        this.totalOvertimeHours += this.overtime[i];
+      }
+      if (this.overtimeMins[i]) {
+        this.totalOvertimeMinutes += this.overtimeMins[i];
+        if (this.totalOvertimeMinutes > 60) {
+          this.totalOvertimeHours += 1;
+          this.totalOvertimeMinutes = this.totalOvertimeMinutes - 60;
+        }
+      }
+    }
+  }
+
+  focused() {
+    console.log('a');
   }
 }
