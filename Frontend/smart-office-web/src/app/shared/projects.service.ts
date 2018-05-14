@@ -11,6 +11,7 @@ export class ProjectService {
   updatePath = '';
   getUsersPath = '';
   addAssignmentPath = '';
+  getProjectsForUserPath = '';
   constructor(private httpService: HttpService,
     private http: HttpClient,
     private router: Router) {
@@ -20,6 +21,7 @@ export class ProjectService {
         this.updatePath = data['updateProject'];
         this.getUsersPath = data['getUsersForProject'];
         this.addAssignmentPath = data['addAssignment'];
+        this.getProjectsForUserPath = data['getProjectsForUser'];
       },
       err => { console.log(err); }
     );
@@ -29,12 +31,20 @@ export class ProjectService {
     return this.httpService.get(this.getAllPath, localStorage.getItem('tfatoken'));
   }
 
+  getProjectById(id) {
+    return this.httpService.get(this.updatePath, localStorage.getItem('tfatoken'), id);
+  }
+
   updateProject(id, body) {
     return this.httpService.put(this.updatePath, id, localStorage.getItem('tfatoken'), body);
   }
 
   getUsersForProject(id) {
     return this.httpService.get(this.getUsersPath, localStorage.getItem('tfatoken'), id);
+  }
+
+  getUsersProject(userId) {
+    return this.httpService.get(this.getProjectsForUserPath, localStorage.getItem('tfatoken'), userId);
   }
 
   insertProject(projectData) {

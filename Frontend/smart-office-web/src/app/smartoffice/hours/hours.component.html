@@ -9,22 +9,23 @@
             <b [ngClass]="trackingDisabled ? 'selected-day' : ''">{{ today }}</b>
           </p>
         </div>
-        <div class="col-md-1">
+        <div *ngIf="!noProjects && !loading " class="col-md-1">
           <div [ngClass]="monthLowerLimit ? 'arrow-disabled' : ''" class="button-frame" (click)="previousWeek()">
             <span class="glyphicon glyphicon-menu-left"></span>
           </div>
         </div>
-        <div class="col-md-5 no-padding">
+        <div *ngIf="!noProjects && !loading" class="col-md-5 no-padding">
           <b>{{ selectedWeekStart }}</b> -
           <b [ngClass]="trackingDisabled ? 'selected-day' : ''">{{ selectedWeekEnd }}</b>
         </div>
-        <div class="col-md-1 no-padding">
+        <div *ngIf="!noProjects && !loading" class="col-md-1 no-padding">
           <div [ngClass]="monthUpperLimit ? 'arrow-disabled' : ''" class="button-frame" (click)="nextWeek()">
             <span class="glyphicon glyphicon-menu-right"></span>
           </div>
         </div>
       </div>
-      <table class="table table-bordered">
+      <so-spinner *ngIf="loading" style="width:200px; height:200px"></so-spinner>
+      <table *ngIf="!noProjects && !loading" class="table table-bordered">
         <thead>
           <tr>
             <th>Project/Day</th>
@@ -38,7 +39,9 @@
         </thead>
         <tbody>
           <tr *ngFor="let project of projects; let i = index">
-            <th>{{ project.name }}</th>
+            <th *ngIf="!loading">
+              <div title="{{project.name}}" class="project-title">{{ project?.name }}</div>
+            </th>
             <ng-container *ngIf="currentWeek == 1">
               <td *ngFor="let tracking of monthTracking.weekOneTracking[0].projectTracking[i].trackingList; let j = index">
                 <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[0].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
@@ -113,29 +116,35 @@
                   disabled class="form-control input-sm">
               </td>
             </ng-container>
-
           </tr>
         </tbody>
       </table>
-      <div class="col-md-12">
+      <div *ngIf="!noProjects && !loading" class="col-md-12">
         <button [disabled]="trackingDisabled || formatError || overtime[currentWeek - 1]" class="btn btn-primary pull-right">Submit</button>
       </div>
-      <small>* please submit your hours until the end of the 4th Friday of the month</small>
-      <div *ngIf="formatError" class="alert alert-warning top-margin" role="alert">
-        Please use the proper format!
+      <small style="margin-top:10px" *ngIf="!noProjects && !loading">* please submit your hours until the end of the 4th Friday of the month</small>
+      <div style="margin-top:10px" *ngIf="formatError" class="alert alert-warning  " role="alert">
+        <strong>Please use the proper format!</strong>
+      </div>
+      <div style="margin-top:10px" *ngIf="noProjects" class="alert alert-warning  " role="alert">
+        <strong>You do not have any project assigned to you!</strong>
+      </div>
+      <div style="margin-top:10px" *ngIf="unauthorized" class="alert alert-danger">
+        <strong>Please login again!</strong> Your session expired.
       </div>
       <ng-container *ngIf="overtime[currentWeek - 1]">
-        <div class="alert alert-warning top-margin" role="alert">
-          Attention, you are
-          <b>{{ overtime[currentWeek - 1]}} hours</b> and
-          <b>{{ overtimeMins[currentWeek - 1]}} minutes</b> overtime this week!
+        <div style="margin-top:10px" class="alert alert-warning  " role="alert">
+          <strong>Attention, you are
+            <b>{{ overtime[currentWeek - 1]}} hours</b> and
+            <b>{{ overtimeMins[currentWeek - 1]}} minutes</b> overtime this week!</strong>
         </div>
       </ng-container>
       <ng-container *ngIf="totalOvertimeHours">
-        <div class="alert alert-warning top-margin" role="alert">
-          Your month overtime is
-          <b>{{ totalOvertimeHours }} hours</b> and
-          <b>{{ totalOvertimeMinutes }} minutes.</b>
+        <div style="margin-top:10px" class="alert alert-warning  " role="alert">
+          <strong>Your month overtime is
+            <b>{{ totalOvertimeHours }} hours</b> and
+            <b>{{ totalOvertimeMinutes }} minutes.</b>
+          </strong>
         </div>
       </ng-container>
     </div>

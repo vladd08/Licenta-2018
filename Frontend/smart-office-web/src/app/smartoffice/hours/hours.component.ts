@@ -8,6 +8,7 @@ import { MonthTracking } from '../../shared/month-tracking.model';
 import { ControlMatrix } from '../../shared/control-matrix.model';
 import { HoursForProject } from '../../shared/hours-for-projects.model';
 import { MonthlyHoursForProjects } from '../../shared/monthly-hours-for-projects.model';
+import { ProjectService } from '../../shared/projects.service';
 
 @Component({
   selector: 'so-hours',
@@ -15,19 +16,7 @@ import { MonthlyHoursForProjects } from '../../shared/monthly-hours-for-projects
   styleUrls: ['./hours.component.css']
 })
 export class HoursComponent implements OnInit {
-  projects = [{
-    name: 'Project 1',
-    totalHours: 0,
-    totalMinutes: 0
-  }, {
-    name: 'Project 2',
-    totalHours: 0,
-    totalMinutes: 0
-  }, {
-    name: 'Project 3',
-    totalHours: 0,
-    totalMinutes: 0
-  }];
+  projects: any[] = [];
 
   todayDate: Date = new Date(Date.now());
   today: string = this.todayDate.toDateString();
@@ -37,6 +26,9 @@ export class HoursComponent implements OnInit {
   selectedWeekEnd: string;
   currentWeek = 1;
 
+  unauthorized: Boolean = false;
+  noProjects: Boolean = false;
+  loading: Boolean = false;
   trackingDisabled: Boolean = false;
   currentWeekNumber: Number = 0;
   monthLowerLimit: Boolean = false;
@@ -60,42 +52,84 @@ export class HoursComponent implements OnInit {
   overtimeMins: number[] = [];
 
   previousValue: string;
-  constructor() { }
+  constructor(private projectService: ProjectService) { }
 
   ngOnInit() {
     const currentDay = this.todayDate.getDay();
     if (currentDay === 6 || currentDay === 0) {
       this.trackingDisabled = false;
     }
+    this.loading = true;
+    setTimeout(() => {
+      this.projectService.getUsersProject(localStorage.getItem('uId')).subscribe((data: any) => {
+        if (data.result.length === 0) {
+          this.noProjects = true;
+        } else {
+          const proj = data.result;
+          this.numberOfProjects = proj.length;
+          for (let i = 0; i < this.numberOfProjects; i++) {
+            this.projectService.getProjectById(proj[i].projectId).subscribe((d: any) => {
+              console.log(d);
+              if (!(new Date(d.result[0].deadline) < new Date(this.todayDate))) {
+                this.projects.push(d.result[0]);
+              }
+            }, (err) => {
+              console.log(err);
+              this.unauthorized = true;
+            });
+          }
+          console.log(this.projects);
+          this.splitMonthInWeeks();
+          for (let i = 0; i < 4; i++) {
+            const controlValueMatrix: ControlMatrix = new ControlMatrix(this.numberOfProjects, 5);
+            this.monthValueErrorMatrix.push(controlValueMatrix);
+          }
+          for (let k = 0; k < 4; k++) {
+            this.monthlyHoursForProjects[k] = [];
+            for (let i = 0; i < this.numberOfProjects; i++) { // initialize total hours for projects
+              const totalHoursForProjects: HoursForProject[] = [];
+              totalHoursForProjects[i] = new HoursForProject(0, 0);
+              this.monthlyHoursForProjects[k][i] = totalHoursForProjects[i];
+            }
+            this.monthlyHoursForProjects[k][this.numberOfProjects] = 0;
+            this.monthlyHoursForProjects[k][this.numberOfProjects + 1] = 0;
+          }
+          console.log(this.monthlyHoursForProjects);
+        }
+        this.loading = false;
+      }, (err) => {
+        this.unauthorized = true;
+        this.loading = false;
+        this.noProjects = true;
+        console.log(err);
+      });
+    }, 2000);
+
     this.mondays = this.getMondays(); // get the Mondays of the current month
     this.sundays = this.getNextSundays(); // get the next 4 Sundays of the month
     for (let i = 0; i < 4; i++) { // setting the current week of the moth - 1,2,3,4
-      if ((this.mondays[i] <= this.todayDate) && (this.todayDate <= this.sundays[i])) {
+      console.log(this.mondays[i]);
+      console.log(this.todayDate);
+      console.log(this.sundays[i]);
+      console.log('----------------');
+      if (this.sameDay(this.mondays[i], this.todayDate) || ((this.mondays[i] < this.todayDate) && (this.todayDate < this.sundays[i]))) {
         this.currentWeek = i + 1;
       }
     }
+    console.log(this.currentWeek);
     console.log(this.mondays);
     console.log(this.sundays);
-    this.selectedWeekStart = this.mondays[0].toDateString();
-    this.selectedWeekEnd = this.sundays[0].toDateString();
+    this.selectedWeekStart = this.mondays[this.currentWeek - 1].toDateString();
+    this.selectedWeekEnd = this.sundays[this.currentWeek - 1].toDateString();
     this.checkMonthLimits();
-    this.numberOfProjects = this.projects.length;
-    this.splitMonthInWeeks();
-    for (let i = 0; i < 4; i++) {
-      const controlValueMatrix: ControlMatrix = new ControlMatrix(this.numberOfProjects, 5);
-      this.monthValueErrorMatrix.push(controlValueMatrix);
-    }
-    for (let k = 0; k < 4; k++) {
-      this.monthlyHoursForProjects[k] = [];
-      for (let i = 0; i < this.numberOfProjects; i++) { // initialize total hours for projects
-        const totalHoursForProjects: HoursForProject[] = [];
-        totalHoursForProjects[i] = new HoursForProject(0, 0);
-        this.monthlyHoursForProjects[k][i] = totalHoursForProjects[i];
-      }
-      this.monthlyHoursForProjects[k][this.numberOfProjects] = 0;
-      this.monthlyHoursForProjects[k][this.numberOfProjects + 1] = 0;
-    }
-    console.log(this.monthlyHoursForProjects);
+
+
+  }
+
+  sameDay(d1, d2) {
+    return d1.getUTCFullYear() === d2.getUTCFullYear() &&
+      d1.getUTCMonth() === d2.getUTCMonth() &&
+      d1.getUTCDate() === d2.getUTCDate();
   }
 
   getMondays() {
@@ -117,7 +151,7 @@ export class HoursComponent implements OnInit {
 
   getNextSundays() {
     const sundays: Date[] = [];
-    let nextSunday = this.getSundayOfWeek(this.todayDate);
+    let nextSunday = this.getSundayOfWeek(this.mondays[0]);
     sundays.push(new Date(nextSunday));
     for (let i = 0; i < 3; i++) {
       nextSunday = new Date(nextSunday.setDate(nextSunday.getDate() + 7));
@@ -358,9 +392,5 @@ export class HoursComponent implements OnInit {
         }
       }
     }
-  }
-
-  focused() {
-    console.log('a');
   }
 }

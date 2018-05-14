@@ -8,5 +8,6 @@
   "getAllProjects" : "https://smart-office-api.herokuapp.com/api/v1/projects/all",
   "updateProject" : "https://smart-office-api.herokuapp.com/api/v1/projects/project",
   "addAssignment" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment",
-  "getUsersForProject" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment/project/all"
+  "getUsersForProject" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment/project/all",
+  "getProjectsForUser" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment/user/all"
 }

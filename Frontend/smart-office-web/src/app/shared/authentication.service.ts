@@ -13,35 +13,35 @@ export class AuthService {
   tfaPath = '';
   token = '';
   constructor(private httpService: HttpService,
-              private http: HttpClient,
-              private router: Router) {
-      this.http.get('../../assets/config.json').subscribe(
-        data  => {
-          this.testPath = data['test'];
-          this.loginPath = data['login'];
-          this.tfaPath = data['2fa'];
-        },
-        err => { console.log(err); }
-      );
+    private http: HttpClient,
+    private router: Router) {
+    this.http.get('../../assets/config.json').subscribe(
+      data => {
+        this.testPath = data['test'];
+        this.loginPath = data['login'];
+        this.tfaPath = data['2fa'];
+      },
+      err => { console.log(err); }
+    );
   }
 
   login(username: string, password: string) {
     this.loading = true;
     this.error = '';
-    const body = { 'username' : username , 'password' : password };
+    const body = { 'username': username, 'password': password };
     this.httpService.post(this.loginPath, '', body).subscribe(
       (data: User) => {
         this.error = '';
         localStorage.setItem('token', (this.token = data.token));
         this.loading = false;
-        localStorage.setItem('name' , data.firstname + ' ' + data.lastname);
+        localStorage.setItem('name', data.firstname + ' ' + data.lastname);
         this.router.navigateByUrl('/2fa');
       },
       err => {
         console.log(err);
         this.error = err;
         this.loading = false;
-       }
+      }
     );
   }
 
@@ -49,7 +49,7 @@ export class AuthService {
     if (!localStorage.getItem('token')) {
       return;
     }
-    const body = { 'tfaCode' : code };
+    const body = { 'tfaCode': code };
     this.httpService.post(this.tfaPath, localStorage.getItem('token'), body).subscribe(
       (data: any) => {
         this.error = '';
@@ -57,6 +57,7 @@ export class AuthService {
         this.token = data.token;
         localStorage.setItem('tfatoken', data.token);
         localStorage.setItem('role', data.role);
+        localStorage.setItem('uId', data.id);
         this.router.navigateByUrl('/main');
       },
       err => {
