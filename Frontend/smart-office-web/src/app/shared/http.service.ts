@@ -17,7 +17,6 @@ export class HttpService {
   }
 
   put(link: string, id: string, token: string, bodyParams?: {}) {
-    console.log(id);
     return this.http.put(link + '/' + id, bodyParams, { headers: { 'x-access-token': token } });
   }
 

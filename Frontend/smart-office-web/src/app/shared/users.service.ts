@@ -9,6 +9,7 @@ export class UserService {
   getAllPath = '';
   createUserPath = '';
   editDeleteUserPath = '';
+  users: any[] = [];
   constructor(private httpService: HttpService,
     private http: HttpClient,
     private router: Router) {
@@ -41,7 +42,6 @@ export class UserService {
       role : data.role,
       cnp : data.cnp
     };
-    console.log(body);
     return this.httpService.post(this.createUserPath, localStorage.getItem('tfatoken'), body);
   }
 

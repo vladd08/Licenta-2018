@@ -34,7 +34,6 @@ export class ProjectsComponent implements OnInit {
     this.loading = true;
     setTimeout(() => {
       this.getAll();
-      this.loading = false;
     }, 2000);
   }
 
@@ -47,6 +46,7 @@ export class ProjectsComponent implements OnInit {
         this.users = dt;
       },
         err => {
+          this.loading = false;
           this.unauthorized = true;
         });
       for (const project of data.result) {
@@ -68,6 +68,7 @@ export class ProjectsComponent implements OnInit {
             const user: User = this.users.find(x => x._id === assignment.userId);
             project.assignees.push(user);
           }
+          this.loading = false;
         });
       }
       this.projects.sort((p1: Project, p2: Project) => {
@@ -80,6 +81,7 @@ export class ProjectsComponent implements OnInit {
     },
       (err) => {
         this.unauthorized = true;
+        this.loading = false;
       });
   }
 
@@ -163,7 +165,7 @@ export class ProjectsComponent implements OnInit {
     },
       (err: any) => {
         console.log(err);
-        if (err.status === 400 ) {
+        if (err.status === 400) {
           this.addProjectError = true;
         } else {
           this.unauthorized = true;

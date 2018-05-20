@@ -1,0 +1,9 @@
+.overall-container {
+  height: 490px;
+  width: 1200px;
+  overflow-y: auto;
+}
+
+.statistic-text {
+  margin-left: 10px;
+}

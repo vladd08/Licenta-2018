@@ -28,15 +28,17 @@ export class UsersComponent implements OnInit {
     this.loading = true;
     setTimeout(() => {
       this.getAll();
-      this.loading = false;
     }, 2000);
   }
 
   getAll() {
     this.userService.getAllUsers().subscribe((data: User[]) => {
       this.users = data;
+      this.userService.users = this.users;
+      this.loading = false;
     },
       err => {
+        this.loading = false;
         this.unauthorized = true;
       });
   }
@@ -45,7 +47,6 @@ export class UsersComponent implements OnInit {
     if (edit) {
       this.showEditForm = true;
       this.user = this.users[index];
-      console.log(this.user);
     } else {
       this.showEditForm = false;
       this.user = null;
@@ -90,7 +91,6 @@ export class UsersComponent implements OnInit {
         case 'male': form.value.sex = 1; break;
         case 'female': form.value.sex = 0; break;
       }
-      console.log(form.value);
       if (!this.showEditForm) {
         this.userService.createUser(form.value).subscribe((data) => {
           this.loading = true;
@@ -113,7 +113,6 @@ export class UsersComponent implements OnInit {
   showProfile(index) {
     if (index !== '' || index === 0) {
       this.user = this.users[index];
-      console.log(this.user);
     }
     this.showDetailForm = !this.showDetailForm;
   }

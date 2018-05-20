@@ -8,12 +8,12 @@
     </ul>
     <ul class="sidebar-nav" id="sidebar">
       <li *ngIf="role == 'admin'">
-        <a routerLink="/main/users" routerLinkActive="is-active" >Users
+        <a routerLink="/main/users" routerLinkActive="is-active">Users
           <span class="sub_icon glyphicon glyphicon-user"></span>
         </a>
       </li>
       <li *ngIf="role == 'angajat'">
-        <a routerLink="/main/hours" routerLinkActive="is-active" >Hours
+        <a routerLink="/main/hours" routerLinkActive="is-active">Hours
           <span class="sub_icon glyphicon glyphicon-time"></span>
         </a>
       </li>
@@ -25,16 +25,15 @@
         </li>
       </ul>
       <li *ngIf="role == 'admin'">
-        <a>Requests
+        <a [ngClass]="requestExists ? 'notification' : ''" routerLink="/main/requests" routerLinkActive="is-active">Requests
           <span class="sub_icon glyphicon glyphicon-bullhorn"></span>
         </a>
       </li>
       <li>
-          <a (click)="logout()">Logout
-            <span class="sub_icon glyphicon glyphicon glyphicon-off"></span>
-          </a>
-        </li>
+        <a (click)="logout()">Logout
+          <span class="sub_icon glyphicon glyphicon glyphicon-off"></span>
+        </a>
+      </li>
     </ul>
   </div>
 </div>
-

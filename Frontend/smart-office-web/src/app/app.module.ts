@@ -23,6 +23,8 @@ import { MatButtonModule, MatCheckboxModule, MatFormFieldModule } from '@angular
 import { ProjectsComponent } from './smartoffice/projects/projects.component';
 import { ProjectService } from './shared/projects.service';
 import { HoursComponent } from './smartoffice/hours/hours.component';
+import { HourService } from './shared/hours.service';
+import { RequestsComponent } from './smartoffice/requests/requests.component';
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -32,7 +34,8 @@ const appRoutes: Routes = [
     path: 'main', component: SmartofficeComponent, canActivate: [AuthGuard], children: [
       { path: 'users', component: UsersComponent },
       { path: 'projects', component: ProjectsComponent },
-      { path: 'hours', component: HoursComponent }
+      { path: 'hours', component: HoursComponent },
+      { path: 'requests', component: RequestsComponent }
     ]
   }
 ];
@@ -47,7 +50,8 @@ const appRoutes: Routes = [
     HeaderComponent,
     UsersComponent,
     ProjectsComponent,
-    HoursComponent
+    HoursComponent,
+    RequestsComponent
   ],
   imports: [
     BrowserModule,
@@ -60,7 +64,7 @@ const appRoutes: Routes = [
     MatFormFieldModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [AuthService, HttpService, AuthGuard, UserService, ProjectService],
+  providers: [AuthService, HttpService, AuthGuard, UserService, ProjectService, HourService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

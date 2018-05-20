@@ -29,12 +29,12 @@
         <thead>
           <tr>
             <th>Project/Day</th>
-            <th [ngClass]="todayDate.getDay() === 1 ? 'selected-day' : ''" class="col-md-2">Monday</th>
-            <th [ngClass]="todayDate.getDay() === 2 ? 'selected-day' : ''" class="col-md-2">Tuesday</th>
+            <th [ngClass]="todayDate.getDay() === 1 ? 'selected-day' : ''" class="col-md-1">Monday</th>
+            <th [ngClass]="todayDate.getDay() === 2 ? 'selected-day' : ''" class="col-md-1">Tuesday</th>
             <th [ngClass]="todayDate.getDay() === 3 ? 'selected-day' : ''" class="col-md-1">Wednesday</th>
-            <th [ngClass]="todayDate.getDay() === 4 ? 'selected-day' : ''" class="col-md-2">Thurstday</th>
-            <th [ngClass]="todayDate.getDay() === 5 ? 'selected-day' : ''" class="col-md-2">Friday</th>
-            <th class="col-md-3">Total</th>
+            <th [ngClass]="todayDate.getDay() === 4 ? 'selected-day' : ''" class="col-md-1">Thurstday</th>
+            <th [ngClass]="todayDate.getDay() === 5 ? 'selected-day' : ''" class="col-md-3">Friday</th>
+            <th class="col-md-4">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -43,28 +43,28 @@
               <div title="{{project.name}}" class="project-title">{{ project?.name }}</div>
             </th>
             <ng-container *ngIf="currentWeek == 1">
-              <td *ngFor="let tracking of monthTracking.weekOneTracking[0].projectTracking[i].trackingList; let j = index">
+              <td *ngFor="let tracking of monthTracking.weekOneTracking[0]?.projectTracking[i]?.trackingList; let j = index">
                 <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[0].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
                   (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
                   class="form-control input-sm">
               </td>
             </ng-container>
             <ng-container *ngIf="currentWeek == 2">
-              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0].projectTracking[i].trackingList; let j = index">
+              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0]?.projectTracking[i]?.trackingList; let j = index">
                 <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[1].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
                   (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
                   class="form-control input-sm">
               </td>
             </ng-container>
             <ng-container *ngIf="currentWeek == 3">
-              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0].projectTracking[i].trackingList; let j = index">
+              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0]?.projectTracking[i]?.trackingList; let j = index">
                 <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[2].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
                   (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
                   class="form-control input-sm">
               </td>
             </ng-container>
             <ng-container *ngIf="currentWeek == 4">
-              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0].projectTracking[i].trackingList; let j = index">
+              <td *ngFor="let tracking of monthTracking.weekTwoTracking[0]?.projectTracking[i]?.trackingList; let j = index">
                 <input name="timeinput{{i}}{{j}}" [(ngModel)]="monthValueErrorMatrix[3].controlValueMatrix[i][j]" (click)="getPreviousValue($event)"
                   (change)="onTrackingChanged($event,i,j)" [disabled]="trackingDisabled" type="text" [value]="tracking.hours + ':' + tracking.minutes"
                   class="form-control input-sm">
@@ -72,16 +72,20 @@
             </ng-container>
             <td>
               <ng-container *ngIf="currentWeek == 1">
-                <input [value]="monthlyHoursForProjects[0][i].hours + ':' + monthlyHoursForProjects[0][i].minutes" disabled type="text" class="form-control input-sm">
+                <input [value]="monthlyHoursForProjects[0][i]?.hours + ':' + monthlyHoursForProjects[0][i]?.minutes" disabled type="text"
+                  class="form-control input-sm">
               </ng-container>
               <ng-container *ngIf="currentWeek == 2">
-                <input [value]="monthlyHoursForProjects[1][i].hours + ':' + monthlyHoursForProjects[1][i].minutes" disabled type="text" class="form-control input-sm">
+                <input [value]="monthlyHoursForProjects[1][i]?.hours + ':' + monthlyHoursForProjects[1][i]?.minutes" disabled type="text"
+                  class="form-control input-sm">
               </ng-container>
               <ng-container *ngIf="currentWeek == 3">
-                <input [value]="monthlyHoursForProjects[2][i].hours + ':' + monthlyHoursForProjects[2][i].minutes" disabled type="text" class="form-control input-sm">
+                <input [value]="monthlyHoursForProjects[2][i]?.hours + ':' + monthlyHoursForProjects[2][i]?.minutes" disabled type="text"
+                  class="form-control input-sm">
               </ng-container>
               <ng-container *ngIf="currentWeek == 4">
-                <input [value]="monthlyHoursForProjects[3][i].hours + ':' + monthlyHoursForProjects[3][i].minutes" disabled type="text" class="form-control input-sm">
+                <input [value]="monthlyHoursForProjects[3][i]?.hours + ':' + monthlyHoursForProjects[3][i]?.minutes" disabled type="text"
+                  class="form-control input-sm">
               </ng-container>
             </td>
           </tr>
@@ -120,9 +124,9 @@
         </tbody>
       </table>
       <div *ngIf="!noProjects && !loading" class="col-md-12">
-        <button [disabled]="trackingDisabled || formatError || overtime[currentWeek - 1]" class="btn btn-primary pull-right">Submit</button>
+        <button [disabled]="trackingDisabled || formatError || todayDate != sundays[3]" class="btn btn-primary pull-right">Submit</button>
       </div>
-      <small style="margin-top:10px" *ngIf="!noProjects && !loading">* please submit your hours until the end of the 4th Friday of the month</small>
+      <small style="margin-top:10px" *ngIf="!noProjects && !loading">* you can submit your hours only on the last Friday of the month.</small>
       <div style="margin-top:10px" *ngIf="formatError" class="alert alert-warning  " role="alert">
         <strong>Please use the proper format!</strong>
       </div>

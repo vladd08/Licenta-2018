@@ -9,5 +9,6 @@
   "updateProject" : "https://smart-office-api.herokuapp.com/api/v1/projects/project",
   "addAssignment" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment",
   "getUsersForProject" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment/project/all",
-  "getProjectsForUser" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment/user/all"
+  "getProjectsForUser" : "https://smart-office-api.herokuapp.com/api/v1/projects/assignment/user/all",
+  "putHours" : "http://localhost:5000/api/v1/hours/tracking"
 }

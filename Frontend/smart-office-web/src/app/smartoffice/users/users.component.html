@@ -3,7 +3,7 @@
   <h4 *ngIf="!loading && !unauthorized">- {{ users?.length }} users registered -</h4>
   <hr>
   <so-spinner *ngIf="loading"></so-spinner>
-  <div *ngIf="unauthorized" class="alert alert-danger">
+  <div style="margin-top:10px" *ngIf="unauthorized" class="alert alert-danger">
     <strong>Please login again!</strong> Your session expired.
   </div>
   <table *ngIf="!loading && !unauthorized" class="table table-bordered">
@@ -64,8 +64,12 @@
         <li class="list-group-item">Lastname: {{ user.lastname }}</li>
         <li class="list-group-item">Username: {{ user.username }}</li>
         <li class="list-group-item">Age: {{ user.age }}</li>
-        <li class="list-group-item">Sex: {{ user.sex }}   <small>*(1-M , 0-F)</small></li>
-        <li class="list-group-item">Role: {{ user.role }}   <small>*(1-Admin,2-Project Manager,3-Office Manager,4-Angajat)</small></li>
+        <li class="list-group-item">Sex: {{ user.sex }}
+          <small>*(1-M , 0-F)</small>
+        </li>
+        <li class="list-group-item">Role: {{ user.role }}
+          <small>*(1-Admin,2-Project Manager,3-Office Manager,4-Angajat)</small>
+        </li>
         <li class="list-group-item">Email: {{ user.email }}</li>
         <li class="list-group-item">Address: {{ user.address }}</li>
         <li class="list-group-item">Position: {{ user.position }}</li>
@@ -173,7 +177,8 @@
           <hr>
         </div>
       </div>
-      <button *ngIf="!showEditForm" [disabled]="!adduser.valid || ageError || accessCodeError" class="btn btn-primary pull-right" type="submit">Add</button>
+      <button *ngIf="!showEditForm" [disabled]="!adduser.valid || ageError || accessCodeError" class="btn btn-primary pull-right"
+        type="submit">Add</button>
       <button *ngIf="showEditForm" [disabled]="ageError || accessCodeError" class="btn btn-primary pull-right" type="submit">Edit</button>
       <button (click)="showAddModal()" class="btn btn-danger pull-right" type="reset">Cancel</button>
     </form>

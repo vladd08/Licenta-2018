@@ -9,6 +9,7 @@ import { ControlMatrix } from '../../shared/control-matrix.model';
 import { HoursForProject } from '../../shared/hours-for-projects.model';
 import { MonthlyHoursForProjects } from '../../shared/monthly-hours-for-projects.model';
 import { ProjectService } from '../../shared/projects.service';
+import { HourService } from '../../shared/hours.service';
 
 @Component({
   selector: 'so-hours',
@@ -40,6 +41,7 @@ export class HoursComponent implements OnInit {
   monthTracking: MonthTracking = new MonthTracking([], [], [], []);
   monthValueErrorMatrix: ControlMatrix[] = [];
   monthlyHoursForProjects: MonthlyHoursForProjects = new MonthlyHoursForProjects([]);
+  trackings: any[] = [];
   numberOfProjects = 0;
   overtimeHours = 0;
   overtimeMinutes = 0;
@@ -52,7 +54,8 @@ export class HoursComponent implements OnInit {
   overtimeMins: number[] = [];
 
   previousValue: string;
-  constructor(private projectService: ProjectService) { }
+  constructor(private projectService: ProjectService,
+    private hourService: HourService) { }
 
   ngOnInit() {
     const currentDay = this.todayDate.getDay();
@@ -69,34 +72,158 @@ export class HoursComponent implements OnInit {
           this.numberOfProjects = proj.length;
           for (let i = 0; i < this.numberOfProjects; i++) {
             this.projectService.getProjectById(proj[i].projectId).subscribe((d: any) => {
-              console.log(d);
               if (!(new Date(d.result[0].deadline) < new Date(this.todayDate))) {
                 this.projects.push(d.result[0]);
+                this.numberOfProjects = this.projects.length;
               }
             }, (err) => {
               console.log(err);
               this.unauthorized = true;
             });
           }
-          console.log(this.projects);
-          this.splitMonthInWeeks();
-          for (let i = 0; i < 4; i++) {
-            const controlValueMatrix: ControlMatrix = new ControlMatrix(this.numberOfProjects, 5);
-            this.monthValueErrorMatrix.push(controlValueMatrix);
-          }
-          for (let k = 0; k < 4; k++) {
-            this.monthlyHoursForProjects[k] = [];
-            for (let i = 0; i < this.numberOfProjects; i++) { // initialize total hours for projects
-              const totalHoursForProjects: HoursForProject[] = [];
-              totalHoursForProjects[i] = new HoursForProject(0, 0);
-              this.monthlyHoursForProjects[k][i] = totalHoursForProjects[i];
+          this.hourService.getTrackingsForMonth(localStorage.getItem('uId')).subscribe((d: any) => {
+            for (let i = 0; i < 4; i++) {
+              const controlValueMatrix: ControlMatrix = new ControlMatrix(this.numberOfProjects, 5);
+              this.monthValueErrorMatrix.push(controlValueMatrix);
             }
-            this.monthlyHoursForProjects[k][this.numberOfProjects] = 0;
-            this.monthlyHoursForProjects[k][this.numberOfProjects + 1] = 0;
-          }
-          console.log(this.monthlyHoursForProjects);
+            this.splitMonthInWeeks();
+            for (let k = 0; k < 4; k++) {
+              this.monthlyHoursForProjects[k] = [];
+              for (let i = 0; i < this.numberOfProjects; i++) { // initialize total hours for projects
+                const totalHoursForProjects: HoursForProject[] = [];
+                totalHoursForProjects[i] = new HoursForProject(0, 0);
+                this.monthlyHoursForProjects[k][i] = totalHoursForProjects[i];
+              }
+              this.monthlyHoursForProjects[k][this.numberOfProjects] = 0;
+              this.monthlyHoursForProjects[k][this.numberOfProjects + 1] = 0;
+            }
+            this.trackings = d.result;
+            if (this.trackings.length !== 0) {
+              for (const tracking of this.trackings) {
+                for (const project of this.projects) {
+                  if (tracking.projectId === project._id) {
+                    const index = this.projects.indexOf(project);
+                    if ((new Date(tracking.date) > new Date(this.mondays[0])) && (new Date(tracking.date) < new Date(this.sundays[3]))) {
+                      if (this.sameDay(this.mondays[0], new Date(tracking.date))
+                        || ((this.mondays[0] < new Date(tracking.date)) && (new Date(tracking.date) < this.sundays[0]))) {
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekOneTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].hours = tracking.hours;
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekOneTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].minutes = tracking.minutes;
+                        // tslint:disable-next-line:max-line-length
+                        this.monthValueErrorMatrix[0].controlValueMatrix[index][new Date(tracking.date).getDay() - 1] = tracking.hours + ':' + tracking.minutes;
+                        this.monthlyHoursForProjects[0][index].hours += tracking.hours;
+                        this.monthlyHoursForProjects[0][index].minutes += tracking.minutes;
+                        if (this.monthlyHoursForProjects[0][index].minutes >= 60) {
+                          this.monthlyHoursForProjects[0][index].hours += 1;
+                          this.monthlyHoursForProjects[0][index].minutes = this.monthlyHoursForProjects[1][index].minutes - 60;
+                        }
+                        let totalHours = 0;
+                        let totalMinutes = 0;
+                        for (let i = 0; i < this.numberOfProjects; i++) {
+                          totalHours += this.monthlyHoursForProjects[0][i].hours;
+                          totalMinutes += this.monthlyHoursForProjects[0][i].minutes;
+                          if (totalMinutes >= 60) {
+                            totalHours += 1;
+                            totalMinutes -= 60;
+                          }
+                        }
+                        this.monthlyHoursForProjects[0][this.numberOfProjects] = totalHours;
+                        this.monthlyHoursForProjects[0][this.numberOfProjects + 1] = totalMinutes;
+                      }
+                      if (this.sameDay(this.mondays[1], new Date(tracking.date))
+                        || ((this.mondays[1] < new Date(tracking.date)) && (new Date(tracking.date) < this.sundays[1]))) {
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekTwoTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].hours = tracking.hours;
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekTwoTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].minutes = tracking.minutes;
+                        // tslint:disable-next-line:max-line-length
+                        // tslint:disable-next-line:max-line-length
+                        this.monthValueErrorMatrix[1].controlValueMatrix[index][new Date(tracking.date).getDay() - 1] = tracking.hours + ':' + tracking.minutes;
+                        this.monthlyHoursForProjects[1][index].hours += tracking.hours;
+                        this.monthlyHoursForProjects[1][index].minutes += tracking.minutes;
+                        if (this.monthlyHoursForProjects[1][index].minutes >= 60) {
+                          this.monthlyHoursForProjects[1][index].hours += 1;
+                          this.monthlyHoursForProjects[1][index].minutes = this.monthlyHoursForProjects[1][index].minutes - 60;
+                        }
+                        let totalHours = 0;
+                        let totalMinutes = 0;
+                        for (let i = 0; i < this.numberOfProjects; i++) {
+                          totalHours += this.monthlyHoursForProjects[1][i].hours;
+                          totalMinutes += this.monthlyHoursForProjects[1][i].minutes;
+                          if (totalMinutes >= 60) {
+                            totalHours += 1;
+                            totalMinutes -= 60;
+                          }
+                        }
+                        this.monthlyHoursForProjects[1][this.numberOfProjects] = totalHours;
+                        this.monthlyHoursForProjects[1][this.numberOfProjects + 1] = totalMinutes;
+                      }
+                      if (this.sameDay(this.mondays[2], new Date(tracking.date))
+                        || ((this.mondays[2] < new Date(tracking.date)) && (new Date(tracking.date) < this.sundays[2]))) {
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekThreeTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].hours = tracking.hours;
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekThreeTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].minutes = tracking.minutes;
+                        // tslint:disable-next-line:max-line-length
+                        this.monthValueErrorMatrix[2].controlValueMatrix[index][new Date(tracking.date).getDay() - 1] = tracking.hours + ':' + tracking.minutes;
+                        this.monthlyHoursForProjects[2][index].hours += tracking.hours;
+                        this.monthlyHoursForProjects[2][index].minutes += tracking.minutes;
+                        if (this.monthlyHoursForProjects[2][index].minutes >= 60) {
+                          this.monthlyHoursForProjects[2][index].hours += 1;
+                          this.monthlyHoursForProjects[2][index].minutes = this.monthlyHoursForProjects[1][index].minutes - 60;
+                        }
+                        let totalHours = 0;
+                        let totalMinutes = 0;
+                        for (let i = 0; i < this.numberOfProjects; i++) {
+                          totalHours += this.monthlyHoursForProjects[2][i].hours;
+                          totalMinutes += this.monthlyHoursForProjects[2][i].minutes;
+                          if (totalMinutes >= 60) {
+                            totalHours += 1;
+                            totalMinutes -= 60;
+                          }
+                        }
+                        this.monthlyHoursForProjects[2][this.numberOfProjects] = totalHours;
+                        this.monthlyHoursForProjects[2][this.numberOfProjects + 1] = totalMinutes;
+                      }
+                      if (this.sameDay(this.mondays[3], new Date(tracking.date))
+                        || ((this.mondays[3] < new Date(tracking.date)) && (new Date(tracking.date) < this.sundays[3]))) {
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekFourTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].hours = tracking.hours;
+                        // tslint:disable-next-line:max-line-length
+                        this.monthTracking.weekFourTracking[0].projectTracking[index].trackingList[new Date(tracking.date).getDay() - 1].minutes = tracking.minutes;
+                        // tslint:disable-next-line:max-line-length
+                        this.monthValueErrorMatrix[3].controlValueMatrix[index][new Date(tracking.date).getDay() - 1] = tracking.hours + ':' + tracking.minutes;
+                        this.monthlyHoursForProjects[3][index].hours += tracking.hours;
+                        this.monthlyHoursForProjects[3][index].minutes += tracking.minutes;
+                        if (this.monthlyHoursForProjects[3][index].minutes >= 60) {
+                          this.monthlyHoursForProjects[3][index].hours += 1;
+                          this.monthlyHoursForProjects[3][index].minutes = this.monthlyHoursForProjects[1][index].minutes - 60;
+                        }
+                        let totalHours = 0;
+                        let totalMinutes = 0;
+                        for (let i = 0; i < this.numberOfProjects; i++) {
+                          totalHours += this.monthlyHoursForProjects[3][i].hours;
+                          totalMinutes += this.monthlyHoursForProjects[3][i].minutes;
+                          if (totalMinutes >= 60) {
+                            totalHours += 1;
+                            totalMinutes -= 60;
+                          }
+                        }
+                        this.monthlyHoursForProjects[3][this.numberOfProjects] = totalHours;
+                        this.monthlyHoursForProjects[3][this.numberOfProjects + 1] = totalMinutes;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            this.loading = false;
+          }, (err) => {
+            console.log(err);
+          });
+
         }
-        this.loading = false;
       }, (err) => {
         this.unauthorized = true;
         this.loading = false;
@@ -104,21 +231,13 @@ export class HoursComponent implements OnInit {
         console.log(err);
       });
     }, 2000);
-
     this.mondays = this.getMondays(); // get the Mondays of the current month
     this.sundays = this.getNextSundays(); // get the next 4 Sundays of the month
     for (let i = 0; i < 4; i++) { // setting the current week of the moth - 1,2,3,4
-      console.log(this.mondays[i]);
-      console.log(this.todayDate);
-      console.log(this.sundays[i]);
-      console.log('----------------');
       if (this.sameDay(this.mondays[i], this.todayDate) || ((this.mondays[i] < this.todayDate) && (this.todayDate < this.sundays[i]))) {
         this.currentWeek = i + 1;
       }
     }
-    console.log(this.currentWeek);
-    console.log(this.mondays);
-    console.log(this.sundays);
     this.selectedWeekStart = this.mondays[this.currentWeek - 1].toDateString();
     this.selectedWeekEnd = this.sundays[this.currentWeek - 1].toDateString();
     this.checkMonthLimits();
@@ -182,18 +301,11 @@ export class HoursComponent implements OnInit {
   splitMonthInWeeks() {
     const weekTrackingAux = new WeekTracking([]);
     for (let i = 0; i < this.numberOfProjects; i++) {
-      const oneWeekTracking: ProjectTracking = new ProjectTracking(new Array(
-        new Tracking(this.mondays[0], this.sundays[0],
-          1, 0, 0),
-        new Tracking(this.mondays[0], this.sundays[0],
-          2, 0, 0),
-        new Tracking(this.mondays[0], this.sundays[0],
-          3, 0, 0),
-        new Tracking(this.mondays[0], this.sundays[0],
-          4, 0, 0),
-        new Tracking(this.mondays[0], this.sundays[0],
-          5, 0, 0)
-      ));
+      const oneWeekTracking: ProjectTracking = new ProjectTracking(new Array());
+      for (let aux = 0; aux < 5; aux++) {
+
+        oneWeekTracking.trackingList[aux] = new Tracking(this.mondays[0], this.sundays[0], i, 0, 0);
+      }
       weekTrackingAux.projectTracking.push(oneWeekTracking);
     }
     this.monthTracking.weekOneTracking.push(weekTrackingAux);
@@ -223,7 +335,6 @@ export class HoursComponent implements OnInit {
   }
 
   checkMonthLimits() {
-    console.log(this.currentWeek);
     this.monthLowerLimit = this.currentWeek === 1 ? true : false;
     this.monthUpperLimit = this.currentWeek === 4 ? true : false;
   }
@@ -238,8 +349,6 @@ export class HoursComponent implements OnInit {
     } else {
       this.previousValue = event.target.value;
     }
-    console.log('Previous value is now: ');
-    console.log(this.previousValue);
   }
 
   onTrackingChanged($event: any, projectIndex: number, trackingIndex: number) {
@@ -269,6 +378,16 @@ export class HoursComponent implements OnInit {
       this.formatError = false;
       let trackingChanged;
       let hoursForProject;
+      let auxDate = new Date(this.mondays[this.currentWeek - 1]);
+      auxDate = new Date(auxDate.setDate(auxDate.getDate() + trackingIndex));
+      this.hourService.insertTracking(localStorage.getItem('uId'), {
+        date: auxDate,
+        hours: hours,
+        minutes: minutes,
+        projectId: this.projects[projectIndex]._id
+      }).subscribe((data) => {
+
+      });
       switch (this.currentWeek) {
         case 1:
           trackingChanged = this.monthTracking.weekOneTracking[0].projectTracking[projectIndex].trackingList[trackingIndex];
@@ -286,14 +405,6 @@ export class HoursComponent implements OnInit {
           hoursForProject = this.monthlyHoursForProjects[3][projectIndex];
           break;
       }
-      console.log('Number of hours is: ');
-      console.log(hours);
-      console.log('Number of minutes is: ');
-      console.log(minutes);
-      console.log('Previous number of hours is: ');
-      console.log(previousHours);
-      console.log('Previous number of minutes is: ');
-      console.log(previousMinutes);
       if (previousHours > hours || previousMinutes > minutes) {
         if (previousHours > hours) {
           let diff;
@@ -325,25 +436,11 @@ export class HoursComponent implements OnInit {
         hoursForProject.hours -= 1;
         hoursForProject.minutes = 60 + hoursForProject.minutes;
       }
-      // console.log('Total hours matrix: ');
-      // console.log(this.monthlyHoursForProjects);
-      // console.log('The change is: ');
-      // console.log(value);
-      // console.log('On tracking:');
-      // console.log(trackingChanged);
-
-      this.totalHoursForProject(projectIndex);
-      //   console.log('--------------------------------------------------------');
-      //   console.log('Updated matrix for the month is: ');
-      //   console.log(this.monthValueErrorMatrix);
-      //   console.log('--------------------------------------------------------');
-      //   console.log('Month tracking is: ');
-      //   console.log(this.monthTracking);
-      //   console.log('--------------------------------------------------------');
+      this.totalHoursForProject();
     }
   }
 
-  totalHoursForProject(projectIndex: number) {
+  totalHoursForProject() {
     let totalHours = 0;
     let totalMinutes = 0;
     this.totalHoursForAllProjects = 0;
@@ -360,7 +457,6 @@ export class HoursComponent implements OnInit {
     } else {
       this.overtime[this.currentWeek - 1] = 0;
     }
-    console.log(trackingArraySelect);
     for (let i = 0; i < this.numberOfProjects; i++) {
       totalHours += trackingArraySelect[i].hours;
       totalMinutes += trackingArraySelect[i].minutes;
@@ -381,12 +477,12 @@ export class HoursComponent implements OnInit {
     this.totalOvertimeHours = 0;
     this.totalOvertimeMinutes = 0;
     for (let i = 0; i < 4; i++) {
-      if (this.overtime[i]) {
+      if (this.overtime[i] > 0) {
         this.totalOvertimeHours += this.overtime[i];
       }
-      if (this.overtimeMins[i]) {
+      if (this.overtimeMins[i] > 0) {
         this.totalOvertimeMinutes += this.overtimeMins[i];
-        if (this.totalOvertimeMinutes > 60) {
+        if (this.totalOvertimeMinutes >= 60) {
           this.totalOvertimeHours += 1;
           this.totalOvertimeMinutes = this.totalOvertimeMinutes - 60;
         }

@@ -1,0 +1,42 @@
+<div class="row">
+  <h1>All Requests </h1>
+  <hr>
+  <so-spinner *ngIf="loading"></so-spinner>
+  <div *ngIf="!loading" class="overall-container">
+    <div *ngFor="let report of reportList; let  i = index" class="container">
+      <div class="row">
+        <h3>Request from
+          <b>{{ report.Firstname }} {{ report.Lastname }}</b> for
+          <b>{{ report.Month }} {{ report.Year }}</b>
+        </h3>
+        <hr>
+        <ul>
+          <li class="statistic-text">Total hours:
+            <b>{{ report.TotalHours }}</b>
+          </li>
+          <li class="statistic-text">Total minutes:
+            <b>{{ report.TotalMinutes }}</b>
+          </li>
+          <li class="statistic-text">Total overtime:
+            <b>{{ report.Overtime }}</b> hours
+          </li>
+          <li class="statistic-text">Projects worked on:
+            <ul>
+              <li *ngFor="let project of report.Projects; let j = index">
+                <b>{{ project.name }} </b> -
+                <b>{{ report.Hours[j] }}</b> hours &
+                <b>{{ report.Minutes[j] }}</b> minutes
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <hr>
+        <div class="row">
+          <button style="margin-right:5px" class="btn btn-danger">Deny</button>
+          <button class="btn btn-success">Accept</button>
+        </div>
+      </div>
+    </div>
+    <hr>
+  </div>
+</div>
