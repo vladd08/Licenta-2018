@@ -29,18 +29,18 @@ export class UserService {
 
   createUser(data) {
     const body = {
-      firstname : data.firstname,
-      lastname : data.lastname,
-      username : data.username,
+      firstname: data.firstname,
+      lastname: data.lastname,
+      username: data.username,
       password: data.password,
-      sex : data.sex,
-      age : data.age,
-      email : data.email,
-      address : data.address,
-      position : data.position,
-      accessCard : data.accesscode,
-      role : data.role,
-      cnp : data.cnp
+      sex: data.sex,
+      age: data.age,
+      email: data.email,
+      address: data.address,
+      position: data.position,
+      accessCard: data.accesscode,
+      role: data.role,
+      cnp: data.cnp
     };
     return this.httpService.post(this.createUserPath, localStorage.getItem('tfatoken'), body);
   }

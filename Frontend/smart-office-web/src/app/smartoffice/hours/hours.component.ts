@@ -10,6 +10,8 @@ import { HoursForProject } from '../../shared/hours-for-projects.model';
 import { MonthlyHoursForProjects } from '../../shared/monthly-hours-for-projects.model';
 import { ProjectService } from '../../shared/projects.service';
 import { HourService } from '../../shared/hours.service';
+import { MatSnackBar } from '@angular/material';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'so-hours',
@@ -55,7 +57,9 @@ export class HoursComponent implements OnInit {
 
   previousValue: string;
   constructor(private projectService: ProjectService,
-    private hourService: HourService) { }
+    private hourService: HourService,
+    public snackBar: MatSnackBar,
+    private router: Router) { }
 
   ngOnInit() {
     const currentDay = this.todayDate.getDay();
@@ -488,5 +492,18 @@ export class HoursComponent implements OnInit {
         }
       }
     }
+  }
+
+  submitRequest() {
+    const body = {
+      month: new Date(this.todayDate).getMonth() + 1,
+      status: 'pending',
+      userId: localStorage.getItem('uId')
+    };
+    this.hourService.submitRequest(body).subscribe((data: any) => {
+      this.snackBar.open('Hours submitted successfully!', 'Okay', { duration: 3000 });
+    }, (err) => {
+      console.log(err);
+    });
   }
 }

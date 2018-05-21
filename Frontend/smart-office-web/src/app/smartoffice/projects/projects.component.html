@@ -4,6 +4,7 @@
   <button (click)="showProjectForm()" *ngIf="!loading && !unauthorized" class="btn btn-success btn-xs">Add a new project</button>
   <hr>
   <so-spinner *ngIf="loading"></so-spinner>
+  <hr *ngIf="loading">
   <div *ngIf="unauthorized" class="alert alert-danger">
     <strong>Please login again!</strong> Your session expired.
   </div>
@@ -162,7 +163,7 @@
     <hr class="profile-separator">
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
-        <li class="list-group-item">Hours estimated: {{ project.estimated }}
+        <li [ngClass]="project.estimated < project.hourstotal ? 'overestimated' : ''" class="list-group-item">Hours estimated: {{ project.estimated }}
           <input [disabled]="project?.finished" [(ngModel)]="extrahours" class="form-control input-sm" type="text" id="extrahours"
             name="extrahours" />
           <button [disabled]="project?.finished" (click)="addHoursToProject()" style="margin-top:5px" class="btn btn-default btn-xs">Add more hours</button>

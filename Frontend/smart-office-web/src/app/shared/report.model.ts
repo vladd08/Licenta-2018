@@ -12,6 +12,7 @@ export class Report {
   public TotalMinutes = 0;
   public TotalHours = 0;
   public Overtime = 0;
+  public id: string;
 
   constructor() { }
 }

@@ -4,6 +4,8 @@ import { UserService } from '../../shared/users.service';
 import { ProjectService } from '../../shared/projects.service';
 import { Report } from '../../shared/report.model';
 import { Project } from '../../shared/project.model';
+import { MatSnackBar } from '@angular/material';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'so-requests',
@@ -22,7 +24,9 @@ export class RequestsComponent implements OnInit {
 
   constructor(private hourService: HourService,
     private userService: UserService,
-    private projectService: ProjectService) { }
+    private projectService: ProjectService,
+    public snackBar: MatSnackBar,
+    public router: Router) { }
 
   ngOnInit() {
     this.loading = true;
@@ -30,6 +34,7 @@ export class RequestsComponent implements OnInit {
       this.requests = this.hourService.requests;
       for (const request of this.requests) {
         const report = new Report();
+        report.id = request._id;
         for (const user of this.userService.users) {
           if (user._id === request.userId) {
             report.Firstname = user.firstname;
@@ -39,7 +44,6 @@ export class RequestsComponent implements OnInit {
 
         this.hourService.getTrackingsForMonth(request.userId).subscribe((data: any) => {
           const trackings = data.result;
-
           const month = request.month;
           let stringMonth = '';
           switch (month) {
@@ -112,9 +116,13 @@ export class RequestsComponent implements OnInit {
                 this.loading = false;
               });
             }, 2000);
+          } else {
+            this.loading = false;
           }
         });
       }
+    } else {
+      this.loading = false;
     }
   }
 
@@ -170,5 +178,26 @@ export class RequestsComponent implements OnInit {
       }
     }
     return projs;
+  }
+
+  acceptTracking(index) {
+    const body = {
+      status: 'approved'
+    };
+    this.hourService.acceptTracking(this.reportList[index].id, body).subscribe((data: any) => {
+      for (let i = 0; i < this.reportList[index].Projects.length; i++) {
+        this.projectService.updateProject(this.reportList[index].Projects[i]._id, {
+          hourstotal: this.reportList[index].Hours[i] + this.reportList[index].Projects[i].hourstotal
+        }).subscribe((d: any) => {
+          this.snackBar.open('Hours added to project(s)', 'Okay', { duration: 3000 });
+          this.hourService.requests.splice(this.hourService.requests.indexOf(this.reportList[index]), 1);
+          setTimeout(() => {
+            location.reload();
+          }, 1500);
+        }, (err) => {
+          console.log(err);
+        });
+      }
+    });
   }
 }

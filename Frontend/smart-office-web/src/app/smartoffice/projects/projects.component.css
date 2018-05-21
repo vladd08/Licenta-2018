@@ -32,6 +32,10 @@
   overflow-y: auto;
 }
 
+.overestimated {
+  color: red!important;
+}
+
 .overall-container {
   height: 490px;
   width: 1200px;

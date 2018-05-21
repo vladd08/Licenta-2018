@@ -124,7 +124,7 @@
         </tbody>
       </table>
       <div *ngIf="!noProjects && !loading" class="col-md-12">
-        <button [disabled]="trackingDisabled || formatError || todayDate != sundays[3]" class="btn btn-primary pull-right">Submit</button>
+        <button [disabled]="trackingDisabled || formatError" (click)="submitRequest()" class="btn btn-primary pull-right">Submit</button>
       </div>
       <small style="margin-top:10px" *ngIf="!noProjects && !loading">* you can submit your hours only on the last Friday of the month.</small>
       <div style="margin-top:10px" *ngIf="formatError" class="alert alert-warning  " role="alert">

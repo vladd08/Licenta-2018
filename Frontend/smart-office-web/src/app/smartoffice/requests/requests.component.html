@@ -2,6 +2,9 @@
   <h1>All Requests </h1>
   <hr>
   <so-spinner *ngIf="loading"></so-spinner>
+  <div *ngIf="requests.length === 0" class="alert alert-warning" role="alert">
+    There are no requests at this time.
+  </div>
   <div *ngIf="!loading" class="overall-container">
     <div *ngFor="let report of reportList; let  i = index" class="container">
       <div class="row">
@@ -32,8 +35,8 @@
         </ul>
         <hr>
         <div class="row">
-          <button style="margin-right:5px" class="btn btn-danger">Deny</button>
-          <button class="btn btn-success">Accept</button>
+          <button style="margin-left:20px; margin-right:5px" class="btn btn-danger">Deny</button>
+          <button (click)="acceptTracking(i)" class="btn btn-success">Accept</button>
         </div>
       </div>
     </div>
