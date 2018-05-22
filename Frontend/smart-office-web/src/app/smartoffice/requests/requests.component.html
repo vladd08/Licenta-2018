@@ -35,8 +35,8 @@
         </ul>
         <hr>
         <div class="row">
-          <button style="margin-left:20px; margin-right:5px" class="btn btn-danger">Deny</button>
-          <button (click)="acceptTracking(i)" class="btn btn-success">Accept</button>
+          <button (click)="acceptTracking(i, 'pending')" style="margin-left:20px; margin-right:5px" class="btn btn-danger">Deny</button>
+          <button (click)="acceptTracking(i, 'approved')" class="btn btn-success">Accept</button>
         </div>
       </div>
     </div>

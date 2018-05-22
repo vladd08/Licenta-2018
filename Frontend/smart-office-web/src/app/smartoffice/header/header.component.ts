@@ -21,7 +21,7 @@ export class HeaderComponent implements OnInit {
     this.role = localStorage.getItem('role');
     if (this.role === 'admin') {
       setTimeout(() => {
-        this.hourService.getRequests('5ad8c5046de36700213be4e0').subscribe((data: any) => {
+        this.hourService.getRequests().subscribe((data: any) => {
           this.requests = data.result;
           if (this.requests.length !== 0) {
             this.hourService.requests = this.requests;

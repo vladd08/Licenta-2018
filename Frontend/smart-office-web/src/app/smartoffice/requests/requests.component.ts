@@ -180,9 +180,9 @@ export class RequestsComponent implements OnInit {
     return projs;
   }
 
-  acceptTracking(index) {
+  acceptTracking(index, status) {
     const body = {
-      status: 'approved'
+      status: status
     };
     this.hourService.acceptTracking(this.reportList[index].id, body).subscribe((data: any) => {
       for (let i = 0; i < this.reportList[index].Projects.length; i++) {

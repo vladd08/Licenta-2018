@@ -2,6 +2,7 @@
   height: 490px;
   width: 1200px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .button-frame {

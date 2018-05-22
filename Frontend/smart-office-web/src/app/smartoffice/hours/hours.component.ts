@@ -504,6 +504,9 @@ export class HoursComponent implements OnInit {
       this.snackBar.open('Hours submitted successfully!', 'Okay', { duration: 3000 });
     }, (err) => {
       console.log(err);
+      if (err.status === 304) {
+        this.snackBar.open('Already submitted for this month!', 'Okay', { duration: 3000 });
+      }
     });
   }
 }

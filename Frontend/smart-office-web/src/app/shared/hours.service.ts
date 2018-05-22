@@ -28,8 +28,8 @@ export class HourService {
     return this.httpService.get(this.putHoursTrackingPath, localStorage.getItem('tfatoken'), id);
   }
 
-  getRequests(id) {
-    return this.httpService.get(this.putHoursTrackingPath + '/requests', localStorage.getItem('tfatoken'), id);
+  getRequests() {
+    return this.httpService.get(this.putHoursTrackingPath + '/requests', localStorage.getItem('tfatoken'));
   }
 
   acceptTracking(trackingId, data) {
