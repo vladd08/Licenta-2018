@@ -21,6 +21,7 @@ export class RequestsComponent implements OnInit {
 
   mondays: Date[] = [];
   sundays: Date[] = [];
+  todayDate: Date = new Date(Date.now());
 
   constructor(private hourService: HourService,
     private userService: UserService,
@@ -133,9 +134,15 @@ export class RequestsComponent implements OnInit {
   }
 
   getMondays(date: string) {
-    const d = new Date(date),
-      month = d.getMonth(),
-      mondays = [];
+    let d = new Date();
+    let month = d.getMonth();
+    const mondays = [];
+    const y = d.getFullYear(), m = d.getMonth();
+    const firstDay = new Date(y, m, 1);
+    if (firstDay.getDate() === this.todayDate.getDate()) {
+      month -= 1;
+    }
+    d = new Date(y, month);
     d.setDate(1);
     // Get the first Monday in the month
     while (d.getDay() !== 1) {

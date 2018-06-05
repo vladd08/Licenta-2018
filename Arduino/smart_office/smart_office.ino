@@ -4,7 +4,7 @@ unsigned long int previous = 0;
 int redLed = 7;
 int greenLed = 8;
 
-rdm630 rfid(2, 0);  //TX-pin of RDM630 connected to Arduino pin 2
+rdm630 rfid(3, 0);  //TX-pin of RDM630 connected to Arduino pin 2
 
 void setup() {
   // put your setup code here, to run once:
@@ -34,6 +34,7 @@ void loop() {
    
   if(rfid.available()){
        rfid.getData(data,length);
+       digitalWrite(redLed, HIGH);
        //concatenate the bytes in the data array to one long which can be 
        //rendered as a decimal number
        unsigned long result = 
@@ -42,5 +43,6 @@ void loop() {
          ((unsigned long int)data[3]<<8) + 
          data[4];    
        Serial.print(result);
+       digitalWrite(redLed, LOW);
     }
 }
