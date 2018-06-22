@@ -9,6 +9,9 @@
     <strong>Please login again!</strong> Your session expired.
   </div>
   <div *ngIf="!loading" class="overall-container">
+    <div *ngIf="noProjects" class="alert alert-warning project-error-alert" role="alert">
+      There are no projects at the moment!
+    </div>
     <div *ngFor="let project of projects; let i = index" class="container">
       <div class="row project">
         <div class="col-md-4 project-header">
@@ -127,6 +130,7 @@
     <div class="dropdown">
       <p>Assignee list</p>
       <select class="form-control" [(ngModel)]="assigneeToAdd">
+        <option selected disabled hidden value="">Please select an employee</option>
         <option *ngFor="let user of users; let i = index" value="{{user._id}}">{{ user.firstname }} {{ user.lastname }}</option>
       </select>
     </div>
@@ -152,7 +156,7 @@
         <span class="glyphicon glyphicon-file"></span>
       </div>
       <div class="col-md-8 profile-header">
-        <button type="button" (click)="showProject()" class="close" aria-label="Close">
+        <button type="button" (click)="showProject('')" class="close" aria-label="Close">
           <span class="close" aria-hidden="true">&times;</span>
         </button>
         <h3>{{ project.name }}</h3>
@@ -179,6 +183,11 @@
           <a>{{ project.issuetrackinglink }}</a>
         </li>
       </div>
+    </div>
+    <div class="row">
+      <canvas baseChart [chartType]="'line'" [datasets]="projectData"
+        [labels]="projectLabels" [options]="chartOptions" [legend]="true">
+      </canvas>
     </div>
   </div>
 </div>

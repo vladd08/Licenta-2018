@@ -25,6 +25,7 @@ import { ProjectService } from './shared/projects.service';
 import { HoursComponent } from './smartoffice/hours/hours.component';
 import { HourService } from './shared/hours.service';
 import { RequestsComponent } from './smartoffice/requests/requests.component';
+import { ChartsModule } from 'ng2-charts';
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -62,6 +63,7 @@ const appRoutes: Routes = [
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
+    ChartsModule,
     RouterModule.forRoot(appRoutes)
   ],
   providers: [AuthService, HttpService, AuthGuard, UserService, ProjectService, HourService],
