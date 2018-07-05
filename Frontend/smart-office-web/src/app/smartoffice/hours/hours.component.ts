@@ -108,6 +108,7 @@ export class HoursComponent implements OnInit {
                   if (tracking.projectId === project._id) {
                     const index = this.projects.indexOf(project);
                     if ((new Date(tracking.date) > new Date(this.mondays[0])) && (new Date(tracking.date) < new Date(this.sundays[3]))) {
+                      console.log('a');
                       if (this.sameDay(this.mondays[0], new Date(tracking.date))
                         || ((this.mondays[0] < new Date(tracking.date)) && (new Date(tracking.date) < this.sundays[0]))) {
                         // tslint:disable-next-line:max-line-length
